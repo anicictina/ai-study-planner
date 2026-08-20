@@ -1,0 +1,74 @@
+<h2 mat-dialog-title>{{ isEditMode ? 'Izmeni sesiju' : 'Nova sesija učenja' }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <mat-dialog-content class="form-content">
+    <mat-form-field appearance="outline">
+      <mat-label>Predmet</mat-label>
+      <mat-select formControlName="subjectId">
+        @for (subject of subjects; track subject.id) {
+          <mat-option [value]="subject.id">{{ subject.name }}</mat-option>
+        }
+      </mat-select>
+      @if (form.controls.subjectId.hasError('required')) {
+        <mat-error>Predmet je obavezan</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Tema</mat-label>
+      <input matInput formControlName="topic" placeholder="npr. Normalizacija" />
+    </mat-form-field>
+
+    <div class="row">
+      <mat-form-field appearance="outline">
+        <mat-label>Datum</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="sessionDate" />
+        <mat-datepicker-toggle matIconSuffix [for]="picker" />
+        <mat-datepicker #picker />
+        @if (form.controls.sessionDate.hasError('required')) {
+          <mat-error>Datum je obavezan</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Početak</mat-label>
+        <input matInput type="time" formControlName="startTime" />
+      </mat-form-field>
+    </div>
+
+    <div class="row">
+      <mat-form-field appearance="outline">
+        <mat-label>Trajanje (min)</mat-label>
+        <input matInput type="number" formControlName="durationMinutes" min="1" />
+        @if (form.controls.durationMinutes.hasError('required')) {
+          <mat-error>Trajanje je obavezno</mat-error>
+        }
+        @if (form.controls.durationMinutes.hasError('min')) {
+          <mat-error>Mora biti bar 1 minut</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Tip aktivnosti</mat-label>
+        <mat-select formControlName="activityType">
+          <mat-option value="READING">Čitanje</mat-option>
+          <mat-option value="PRACTICE">Vežbanje</mat-option>
+          <mat-option value="QUIZ">Kviz</mat-option>
+          <mat-option value="REVISION">Ponavljanje</mat-option>
+          <mat-option value="HOMEWORK">Domaći zadatak</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    @if (errorMessage()) {
+      <p class="error-message">{{ errorMessage() }}</p>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="cancel()">Otkaži</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="saving()">
+      {{ isEditMode ? 'Sačuvaj' : 'Dodaj' }}
+    </button>
+  </mat-dialog-actions>
+</form>

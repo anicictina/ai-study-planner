@@ -1,0 +1,35 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.header h1 {
+  font-size: 1.75rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.empty-state {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.session-table {
+  width: 100%;
+}
+
+.color-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.done {
+  color: var(--mat-sys-on-surface-variant);
+  text-decoration: line-through;
+}
