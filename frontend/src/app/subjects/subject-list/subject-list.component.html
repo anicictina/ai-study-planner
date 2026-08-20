@@ -1,0 +1,61 @@
+<div class="header">
+  <h1>Predmeti</h1>
+  <div class="header-actions">
+    <mat-slide-toggle [checked]="showArchived()" (change)="toggleArchived()">
+      Prikaži arhivirane
+    </mat-slide-toggle>
+    <button mat-flat-button color="primary" (click)="openCreateDialog()">
+      <mat-icon>add</mat-icon>
+      Novi predmet
+    </button>
+  </div>
+</div>
+
+@if (!loading() && subjects().length === 0) {
+  <p class="empty-state">
+    {{ showArchived() ? 'Nema arhiviranih predmeta.' : 'Još nemaš dodatih predmeta. Dodaj prvi predmet da počneš.' }}
+  </p>
+}
+
+<div class="subject-grid">
+  @for (subject of subjects(); track subject.id) {
+    <mat-card class="subject-card" [style.border-left-color]="subject.color">
+      <mat-card-header>
+        <mat-card-title>{{ subject.name }}</mat-card-title>
+        <mat-card-subtitle>{{ subject.credits }} ESPB</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        @if (subject.description) {
+          <p class="description">{{ subject.description }}</p>
+        }
+
+        <div class="chips">
+          <mat-chip-set>
+            <mat-chip>Težina: {{ difficultyLabels[subject.difficulty] }}</mat-chip>
+            <mat-chip>Prioritet: {{ priorityLabels[subject.priority] }}</mat-chip>
+          </mat-chip-set>
+        </div>
+
+        <div class="knowledge">
+          <span>Znanje: {{ subject.knowledgePercent }}%</span>
+          <mat-progress-bar mode="determinate" [value]="subject.knowledgePercent" />
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions align="end">
+        @if (!subject.archived) {
+          <button mat-icon-button matTooltip="Izmeni" (click)="openEditDialog(subject)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button matTooltip="Arhiviraj" (click)="archive(subject)">
+            <mat-icon>archive</mat-icon>
+          </button>
+        }
+        <button mat-icon-button matTooltip="Obriši" (click)="remove(subject)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  }
+</div>

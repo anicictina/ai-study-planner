@@ -1,0 +1,61 @@
+<h2 mat-dialog-title>{{ isEditMode ? 'Izmeni ispit' : 'Novi ispit' }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <mat-dialog-content class="form-content">
+    <mat-form-field appearance="outline">
+      <mat-label>Predmet</mat-label>
+      <mat-select formControlName="subjectId">
+        @for (subject of subjects; track subject.id) {
+          <mat-option [value]="subject.id">{{ subject.name }}</mat-option>
+        }
+      </mat-select>
+      @if (form.controls.subjectId.hasError('required')) {
+        <mat-error>Predmet je obavezan</mat-error>
+      }
+    </mat-form-field>
+
+    <div class="row">
+      <mat-form-field appearance="outline">
+        <mat-label>Datum ispita</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="examDate" />
+        <mat-datepicker-toggle matIconSuffix [for]="picker" />
+        <mat-datepicker #picker />
+        @if (form.controls.examDate.hasError('required')) {
+          <mat-error>Datum je obavezan</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Vreme</mat-label>
+        <input matInput type="time" formControlName="examTime" />
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Lokacija</mat-label>
+      <input matInput formControlName="location" placeholder="npr. Amfiteatar 1" />
+    </mat-form-field>
+
+    @if (isEditMode) {
+      <mat-form-field appearance="outline">
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="status">
+          <mat-option value="PLANNED">Planiran</mat-option>
+          <mat-option value="PASSED">Položen</mat-option>
+          <mat-option value="FAILED">Pao</mat-option>
+        </mat-select>
+      </mat-form-field>
+    }
+
+    @if (errorMessage()) {
+      <p class="error-message">{{ errorMessage() }}</p>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="cancel()">Otkaži</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="saving()">
+      {{ isEditMode ? 'Sačuvaj' : 'Dodaj' }}
+    </button>
+  </mat-dialog-actions>
+</form>
