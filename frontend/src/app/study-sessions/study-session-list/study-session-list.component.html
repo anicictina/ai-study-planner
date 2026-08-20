@@ -1,0 +1,76 @@
+<div class="header">
+  <h1>Sesije učenja</h1>
+  <button mat-flat-button color="primary" (click)="openCreateDialog()" [disabled]="subjects().length === 0">
+    <mat-icon>add</mat-icon>
+    Nova sesija
+  </button>
+</div>
+
+@if (!loading() && subjects().length === 0) {
+  <p class="empty-state">Prvo dodaj bar jedan predmet na stranici "Predmeti" da bi mogla da dodaš sesiju.</p>
+} @else if (!loading() && sessions().length === 0) {
+  <p class="empty-state">Još nema dodatih sesija učenja.</p>
+}
+
+@if (sessions().length > 0) {
+  <table mat-table [dataSource]="sessions()" class="session-table">
+    <ng-container matColumnDef="completed">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let session">
+        <mat-checkbox
+          [checked]="session.completed"
+          [disabled]="session.completed"
+          matTooltip="Označi kao završeno"
+          (change)="toggleComplete(session)"
+        />
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="subject">
+      <th mat-header-cell *matHeaderCellDef>Predmet</th>
+      <td mat-cell *matCellDef="let session" [class.done]="session.completed">
+        <span class="color-dot" [style.background-color]="session.subjectColor"></span>
+        {{ session.subjectName }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="topic">
+      <th mat-header-cell *matHeaderCellDef>Tema</th>
+      <td mat-cell *matCellDef="let session" [class.done]="session.completed">{{ session.topic || '—' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="date">
+      <th mat-header-cell *matHeaderCellDef>Datum i vreme</th>
+      <td mat-cell *matCellDef="let session" [class.done]="session.completed">
+        {{ session.sessionDate }}{{ session.startTime ? ' ' + session.startTime.slice(0, 5) : '' }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="duration">
+      <th mat-header-cell *matHeaderCellDef>Trajanje</th>
+      <td mat-cell *matCellDef="let session" [class.done]="session.completed">{{ session.durationMinutes }} min</td>
+    </ng-container>
+
+    <ng-container matColumnDef="activityType">
+      <th mat-header-cell *matHeaderCellDef>Tip</th>
+      <td mat-cell *matCellDef="let session">
+        <mat-chip>{{ activityLabels[session.activityType] }}</mat-chip>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let session">
+        <button mat-icon-button matTooltip="Izmeni" (click)="openEditDialog(session)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button matTooltip="Obriši" (click)="remove(session)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+}

@@ -1,0 +1,54 @@
+<div class="header">
+  <h1>Kalendar</h1>
+  <div class="nav">
+    <button mat-icon-button (click)="previousMonth()" aria-label="Prethodni mesec">
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+    <span class="month-label">{{ monthLabel() }}</span>
+    <button mat-icon-button (click)="nextMonth()" aria-label="Sledeći mesec">
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+    <button mat-button (click)="goToToday()">Danas</button>
+  </div>
+</div>
+
+<div class="legend">
+  <span class="legend-item"><span class="dot exam-dot"></span> Ispit</span>
+  <span class="legend-item"><span class="dot session-dot"></span> Sesija učenja</span>
+</div>
+
+<div class="calendar-grid">
+  @for (label of weekdayLabels; track label) {
+    <div class="weekday">{{ label }}</div>
+  }
+
+  @for (week of weeks(); track $index) {
+    @for (day of week; track day.dateKey) {
+      <div class="day-cell" [class.outside]="!day.inMonth" [class.today]="day.isToday">
+        <span class="day-number">{{ day.date.getDate() }}</span>
+
+        <div class="day-items">
+          @for (exam of day.exams; track exam.id) {
+            <div
+              class="day-item exam-item"
+              [matTooltip]="exam.subjectName + (exam.location ? ' — ' + exam.location : '')"
+            >
+              <span class="dot exam-dot"></span>
+              {{ exam.subjectName }}
+            </div>
+          }
+          @for (session of day.sessions; track session.id) {
+            <div
+              class="day-item session-item"
+              [class.done]="session.completed"
+              [matTooltip]="session.subjectName + (session.topic ? ' — ' + session.topic : '')"
+            >
+              <span class="dot session-dot" [style.background-color]="session.subjectColor"></span>
+              {{ session.subjectName }}
+            </div>
+          }
+        </div>
+      </div>
+    }
+  }
+</div>
