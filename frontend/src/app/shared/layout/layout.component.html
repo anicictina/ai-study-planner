@@ -1,0 +1,25 @@
+<mat-toolbar color="primary" class="toolbar">
+  <a routerLink="/dashboard" class="brand">
+    <mat-icon>school</mat-icon>
+    <span>AI Study Planner</span>
+  </a>
+
+  <span class="spacer"></span>
+
+  @if (currentUser(); as user) {
+    <button mat-button [matMenuTriggerFor]="userMenu" class="user-button">
+      <mat-icon>account_circle</mat-icon>
+      {{ user.firstName }} {{ user.lastName }}
+    </button>
+    <mat-menu #userMenu="matMenu">
+      <button mat-menu-item (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span>Odjava</span>
+      </button>
+    </mat-menu>
+  }
+</mat-toolbar>
+
+<main class="content">
+  <router-outlet />
+</main>
