@@ -1,0 +1,9 @@
+h1 {
+  font-size: 1.75rem;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+.welcome-card {
+  max-width: 640px;
+}
