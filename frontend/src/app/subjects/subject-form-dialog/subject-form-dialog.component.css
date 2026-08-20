@@ -1,0 +1,38 @@
+.form-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 360px;
+}
+
+.row {
+  display: flex;
+  gap: 12px;
+}
+
+.row mat-form-field {
+  flex: 1;
+}
+
+.color-picker {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.875rem;
+  margin: 4px 0 12px;
+}
+
+.color-picker input[type='color'] {
+  width: 40px;
+  height: 32px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background: none;
+}
+
+.error-message {
+  color: var(--mat-sys-error);
+  font-size: 0.875rem;
+  margin: 0 0 4px;
+}

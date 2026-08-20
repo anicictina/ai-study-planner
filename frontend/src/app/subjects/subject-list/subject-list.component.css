@@ -1,0 +1,52 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.header h1 {
+  font-size: 1.75rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.empty-state {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.subject-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.subject-card {
+  border-left: 6px solid;
+}
+
+.description {
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.875rem;
+  margin: 8px 0;
+}
+
+.chips {
+  margin: 8px 0;
+}
+
+.knowledge {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.875rem;
+  margin-top: 8px;
+}

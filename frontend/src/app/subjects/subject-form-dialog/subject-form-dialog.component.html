@@ -1,0 +1,75 @@
+<h2 mat-dialog-title>{{ isEditMode ? 'Izmeni predmet' : 'Novi predmet' }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <mat-dialog-content class="form-content">
+    <mat-form-field appearance="outline">
+      <mat-label>Naziv</mat-label>
+      <input matInput formControlName="name" />
+      @if (form.controls.name.hasError('required')) {
+        <mat-error>Naziv je obavezan</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Opis</mat-label>
+      <textarea matInput formControlName="description" rows="2"></textarea>
+    </mat-form-field>
+
+    <div class="row">
+      <mat-form-field appearance="outline">
+        <mat-label>ESPB</mat-label>
+        <input matInput type="number" formControlName="credits" min="1" />
+        @if (form.controls.credits.hasError('required')) {
+          <mat-error>ESPB je obavezan</mat-error>
+        }
+        @if (form.controls.credits.hasError('min')) {
+          <mat-error>ESPB mora biti bar 1</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Znanje (%)</mat-label>
+        <input matInput type="number" formControlName="knowledgePercent" min="0" max="100" />
+        @if (form.controls.knowledgePercent.hasError('min') || form.controls.knowledgePercent.hasError('max')) {
+          <mat-error>Mora biti između 0 i 100</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <div class="row">
+      <mat-form-field appearance="outline">
+        <mat-label>Težina</mat-label>
+        <mat-select formControlName="difficulty">
+          <mat-option value="LOW">Niska</mat-option>
+          <mat-option value="MEDIUM">Srednja</mat-option>
+          <mat-option value="HIGH">Visoka</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Prioritet</mat-label>
+        <mat-select formControlName="priority">
+          <mat-option value="LOW">Nizak</mat-option>
+          <mat-option value="MEDIUM">Srednji</mat-option>
+          <mat-option value="HIGH">Visok</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <label class="color-picker">
+      Boja za prikaz
+      <input type="color" formControlName="color" />
+    </label>
+
+    @if (errorMessage()) {
+      <p class="error-message">{{ errorMessage() }}</p>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="cancel()">Otkaži</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="saving()">
+      {{ isEditMode ? 'Sačuvaj' : 'Dodaj' }}
+    </button>
+  </mat-dialog-actions>
+</form>

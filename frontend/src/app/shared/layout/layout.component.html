@@ -4,6 +4,12 @@
     <span>AI Study Planner</span>
   </a>
 
+  <nav class="nav-links">
+    <a mat-button routerLink="/dashboard" routerLinkActive="active-link">Početna</a>
+    <a mat-button routerLink="/subjects" routerLinkActive="active-link">Predmeti</a>
+    <a mat-button routerLink="/exams" routerLinkActive="active-link">Ispiti</a>
+  </nav>
+
   <span class="spacer"></span>
 
   @if (currentUser(); as user) {
