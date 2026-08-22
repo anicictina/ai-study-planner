@@ -1,5 +1,6 @@
 package com.anicictina.backend.user.dto;
 
+import com.anicictina.backend.user.PreferredTime;
 import com.anicictina.backend.user.User;
 import lombok.Builder;
 
@@ -9,7 +10,8 @@ public record UserResponse(
     String firstName,
     String lastName,
     String email,
-    String role
+    String role,
+    PreferredTime preferredStudyTime
 ) {
 
     public static UserResponse from(User user) {
@@ -19,6 +21,7 @@ public record UserResponse(
             .lastName(user.getLastName())
             .email(user.getEmail())
             .role(user.getRole().name())
+            .preferredStudyTime(user.getPreferredStudyTime())
             .build();
     }
 }

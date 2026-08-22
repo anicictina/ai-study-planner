@@ -6,6 +6,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
 import { ExamListComponent } from './exams/exam-list/exam-list.component';
+import { ProfileComponent } from './profile/profile.component';
 import { LayoutComponent } from './shared/layout/layout.component';
 import { StudySessionListComponent } from './study-sessions/study-session-list/study-session-list.component';
 import { SubjectListComponent } from './subjects/subject-list/subject-list.component';
@@ -23,6 +24,7 @@ export const routes: Routes = [
       { path: 'exams', component: ExamListComponent },
       { path: 'study-sessions', component: StudySessionListComponent },
       { path: 'calendar', component: CalendarComponent },
+      { path: 'profile', component: ProfileComponent },
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' }
     ]
   },

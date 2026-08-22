@@ -20,6 +20,10 @@
       {{ user.firstName }} {{ user.lastName }}
     </button>
     <mat-menu #userMenu="matMenu">
+      <button mat-menu-item routerLink="/profile">
+        <mat-icon>settings</mat-icon>
+        <span>Profil</span>
+      </button>
       <button mat-menu-item (click)="logout()">
         <mat-icon>logout</mat-icon>
         <span>Odjava</span>

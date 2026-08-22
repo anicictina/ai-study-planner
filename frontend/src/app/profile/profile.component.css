@@ -1,0 +1,41 @@
+h1 {
+  font-size: 1.75rem;
+  font-weight: 500;
+  margin-bottom: 24px;
+}
+
+.section-card {
+  max-width: 640px;
+  margin-bottom: 16px;
+}
+
+.days {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.day-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.day-row mat-checkbox {
+  width: 140px;
+  flex-shrink: 0;
+}
+
+.time-field {
+  width: 140px;
+}
+
+.error-message {
+  color: var(--mat-sys-error);
+  font-size: 0.875rem;
+}
+
+.success-message {
+  color: #1e6b1e;
+  font-size: 0.875rem;
+}
