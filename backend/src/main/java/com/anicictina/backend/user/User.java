@@ -50,6 +50,9 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Role role;
 
+    @Enumerated(EnumType.STRING)
+    private PreferredTime preferredStudyTime;
+
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 

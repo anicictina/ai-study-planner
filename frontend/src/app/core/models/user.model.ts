@@ -1,3 +1,5 @@
+import { PreferredTime } from './profile.model';
+
 export type UserRole = 'STUDENT' | 'ADMIN';
 
 export interface AuthUser {
@@ -6,6 +8,7 @@ export interface AuthUser {
   lastName: string;
   email: string;
   role: UserRole;
+  preferredStudyTime: PreferredTime | null;
 }
 
 export interface AuthResponse extends AuthUser {

@@ -45,6 +45,11 @@ export class AuthService {
     return localStorage.getItem(TOKEN_KEY);
   }
 
+  updateCurrentUser(user: AuthUser): void {
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+    this.currentUserSignal.set(user);
+  }
+
   private setSession(response: AuthResponse): void {
     const { token, ...user } = response;
     localStorage.setItem(TOKEN_KEY, token);

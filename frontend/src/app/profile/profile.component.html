@@ -1,0 +1,57 @@
+<h1>Profil</h1>
+
+@if (loading()) {
+  <p>Učitavanje...</p>
+} @else {
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-card-title>Preferirano vreme za učenje</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-form-field appearance="outline">
+          <mat-label>Preferirano vreme</mat-label>
+          <mat-select formControlName="preferredStudyTime">
+            <mat-option [value]="null">Nije određeno</mat-option>
+            <mat-option value="MORNING">Jutro</mat-option>
+            <mat-option value="AFTERNOON">Popodne</mat-option>
+            <mat-option value="EVENING">Veče</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-card-title>Raspoloživo vreme za učenje</mat-card-title>
+        <mat-card-subtitle>Označi dane kada možeš da učiš i unesi vremenski interval</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="days" formArrayName="days">
+          @for (day of days; track day.value; let i = $index) {
+            <div class="day-row" [formGroupName]="i">
+              <mat-checkbox formControlName="enabled">{{ day.label }}</mat-checkbox>
+              <mat-form-field appearance="outline" class="time-field">
+                <mat-label>Od</mat-label>
+                <input matInput type="time" formControlName="startTime" />
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="time-field">
+                <mat-label>Do</mat-label>
+                <input matInput type="time" formControlName="endTime" />
+              </mat-form-field>
+            </div>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    @if (errorMessage()) {
+      <p class="error-message">{{ errorMessage() }}</p>
+    }
+    @if (successMessage()) {
+      <p class="success-message">{{ successMessage() }}</p>
+    }
+
+    <button mat-flat-button color="primary" type="submit" [disabled]="saving()">Sačuvaj</button>
+  </form>
+}
