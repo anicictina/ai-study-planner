@@ -1,5 +1,6 @@
 package com.anicictina.backend.common.exception;
 
+import com.anicictina.backend.ai.AIServiceException;
 import jakarta.validation.ValidationException;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +27,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFound(ResourceNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(ex.getMessage()));
+    }
+
+    @ExceptionHandler(AIServiceException.class)
+    public ResponseEntity<ErrorResponse> handleAIServiceException(AIServiceException ex) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new ErrorResponse(ex.getMessage()));
     }
 
     @ExceptionHandler(ValidationException.class)
