@@ -5,14 +5,127 @@
   </div>
 </div>
 
-<mat-card class="welcome-card">
-  <mat-card-content>
-    <p>
-      Uspešno si prijavljena. Ovo je početna tabla — ovde će uskoro stajati tvoj dnevni plan
-      učenja, predstojeći ispiti i napredak, čim implementiramo naredne module.
-    </p>
-  </mat-card-content>
-</mat-card>
+@if (!loading() && stats(); as s) {
+  <div class="widgets-grid">
+    <mat-card class="widget-card">
+      <mat-card-header>
+        <mat-card-title>Današnji plan</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        @if (s.todaySessions.length === 0) {
+          <p class="empty-widget">Nema planiranih sesija za danas.</p>
+        } @else {
+          <div class="session-list">
+            @for (session of s.todaySessions; track session.id) {
+              <div class="session-row" [class.done]="session.completed">
+                <span class="color-dot" [style.background-color]="session.subjectColor"></span>
+                <span class="time">{{ session.startTime?.slice(0, 5) }}</span>
+                <span class="topic">{{ session.topic || session.subjectName }}</span>
+              </div>
+            }
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="widget-card">
+      <mat-card-header>
+        <mat-card-title>Predstojeći ispiti</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        @if (s.upcomingExams.length === 0) {
+          <p class="empty-widget">Nema predstojećih ispita.</p>
+        } @else {
+          <div class="exam-list">
+            @for (exam of s.upcomingExams; track exam.id) {
+              <div class="exam-row">
+                <span class="color-dot" [style.background-color]="exam.subjectColor"></span>
+                <span class="exam-name">{{ exam.subjectName }}</span>
+                <span class="days-badge">{{ exam.daysRemaining }} {{ exam.daysRemaining === 1 ? 'dan' : 'dana' }}</span>
+              </div>
+            }
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="widget-card">
+      <mat-card-header>
+        <mat-card-title>Nedeljni napredak</mat-card-title>
+        <mat-card-subtitle>{{ formatMinutes(s.weeklyStudy.totalMinutes) }} ove nedelje</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="bar-chart" role="img" aria-label="Vreme učenja po danu u nedelji">
+          @for (day of s.weeklyStudy.byDay; track day.date; let i = $index) {
+            <div class="bar-column">
+              <div
+                class="bar"
+                [style.height.%]="barHeightPercent(day.minutes)"
+                [matTooltip]="formatMinutes(day.minutes)"
+              ></div>
+              <span class="bar-label">{{ weekdayLabels[i] }}</span>
+            </div>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="widget-card">
+      <mat-card-header>
+        <mat-card-title>Prosek na kvizovima</mat-card-title>
+        <mat-card-subtitle>{{ s.quizStats.averageScorePercent }}% u proseku</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        @if (trendPoints().length === 0) {
+          <p class="empty-widget">Još nema rešenih kvizova.</p>
+        } @else if (trendPoints().length === 1) {
+          <p class="empty-widget">Reši još kvizova da bi se video trend.</p>
+        } @else {
+          <svg class="trend-chart" viewBox="0 0 100 100" preserveAspectRatio="none" role="img" aria-label="Trend rezultata na kvizovima">
+            <line x1="0" y1="100" x2="100" y2="100" class="trend-axis" />
+            <path [attr.d]="trendPath()" class="trend-line" />
+            @for (point of trendPoints(); track $index) {
+              <circle
+                [attr.cx]="point.x"
+                [attr.cy]="point.y"
+                r="3"
+                class="trend-point"
+                [matTooltip]="point.materialTitle + ': ' + point.scorePercent + '%'"
+              />
+            }
+          </svg>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="widget-card wide">
+      <mat-card-header>
+        <mat-card-title>Savladano gradivo po predmetu</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        @if (s.materialProgress.length === 0) {
+          <p class="empty-widget">Nema još dodatog gradiva.</p>
+        } @else {
+          <div class="progress-list">
+            @for (progress of s.materialProgress; track progress.subjectId) {
+              <div class="progress-row">
+                <span class="progress-label">{{ progress.subjectName }}</span>
+                <div class="progress-track">
+                  <div
+                    class="progress-fill"
+                    [style.width.%]="progress.learnedPercent"
+                    [style.background-color]="progress.color"
+                  ></div>
+                </div>
+                <span class="progress-value">{{ progress.learnedPercent }}%</span>
+              </div>
+            }
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+  </div>
+}
 
 <div class="quick-links">
   <a routerLink="/subjects">
