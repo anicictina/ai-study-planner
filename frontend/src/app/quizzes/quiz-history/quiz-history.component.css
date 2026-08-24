@@ -1,0 +1,49 @@
+h1 {
+  font-size: 1.75rem;
+  font-weight: 500;
+  margin-bottom: 24px;
+}
+
+.empty-state {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.attempt-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 600px;
+}
+
+.attempt-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.material-title {
+  font-weight: 600;
+  margin: 0;
+}
+
+.date {
+  margin: 4px 0 0;
+  font-size: 0.8125rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.score-good {
+  background: #e3f2e3;
+  color: #1e6b1e;
+}
+
+.score-medium {
+  background: #fff3cd;
+  color: #6b5300;
+}
+
+.score-poor {
+  background: #fde3e3;
+  color: #7a1f1a;
+}

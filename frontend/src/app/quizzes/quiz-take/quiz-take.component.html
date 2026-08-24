@@ -1,0 +1,74 @@
+@if (loading()) {
+  <p>Učitavanje kviza...</p>
+} @else if (!quiz()) {
+  <p class="empty-state">Kviz nije pronađen.</p>
+} @else {
+  <div class="header">
+    <h1>Kviz: {{ quiz()!.materialTitle }}</h1>
+    <a routerLink="/materials" class="back-link">
+      <mat-icon>arrow_back</mat-icon>
+      Nazad na materijale
+    </a>
+  </div>
+
+  @if (!result()) {
+    <div class="questions">
+      @for (question of quiz()!.questions; track question.id; let i = $index) {
+        <mat-card class="question-card">
+          <mat-card-content>
+            <p class="question-text">{{ i + 1 }}. {{ question.questionText }}</p>
+            <mat-radio-group
+              class="options"
+              [value]="selectedAnswers().get(question.id)"
+              (change)="selectAnswer(question.id, $event.value)"
+            >
+              @for (option of question.options; track $index) {
+                <mat-radio-button [value]="$index">{{ option }}</mat-radio-button>
+              }
+            </mat-radio-group>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+
+    @if (errorMessage()) {
+      <p class="error-message">{{ errorMessage() }}</p>
+    }
+
+    <button mat-flat-button color="primary" (click)="submit()" [disabled]="!allAnswered || submitting()">
+      @if (submitting()) {
+        <mat-spinner diameter="20" />
+      } @else {
+        Predaj kviz
+      }
+    </button>
+  } @else {
+    <mat-card class="score-card">
+      <mat-card-content>
+        <p class="score">Rezultat: {{ result()!.correctCount }} / {{ result()!.totalCount }}</p>
+      </mat-card-content>
+    </mat-card>
+
+    <div class="questions">
+      @for (question of quiz()!.questions; track question.id; let i = $index) {
+        <mat-card class="question-card">
+          <mat-card-content>
+            <p class="question-text">{{ i + 1 }}. {{ question.questionText }}</p>
+            <div class="options review">
+              @for (option of question.options; track $index) {
+                <div class="option-row" [class]="optionClass(question.id, $index)">
+                  {{ option }}
+                </div>
+              }
+            </div>
+            <p class="explanation">
+              {{ result()!.results[i].explanation }}
+            </p>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+
+    <a mat-flat-button color="primary" routerLink="/materials">Nazad na materijale</a>
+  }
+}

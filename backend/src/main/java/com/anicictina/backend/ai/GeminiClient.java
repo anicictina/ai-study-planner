@@ -34,7 +34,7 @@ public class GeminiClient {
         this.objectMapper = objectMapper;
     }
 
-    public String generateJson(String prompt) {
+    public String generateJson(String prompt, Map<String, Object> responseSchema) {
         if (apiKey == null || apiKey.isBlank()) {
             throw new AIServiceException(
                 "AI servis nije podešen (nedostaje GEMINI_API_KEY). Kontaktirajte administratora.");
@@ -44,7 +44,7 @@ public class GeminiClient {
             "contents", List.of(Map.of("parts", List.of(Map.of("text", prompt)))),
             "generationConfig", Map.of(
                 "responseMimeType", "application/json",
-                "responseSchema", buildResponseSchema()
+                "responseSchema", responseSchema
             )
         );
 
@@ -83,26 +83,5 @@ public class GeminiClient {
             log.error("Failed to parse Gemini API response: {}", response.body(), e);
             throw new AIServiceException("Neuspešno čitanje odgovora AI servisa.", e);
         }
-    }
-
-    private Map<String, Object> buildResponseSchema() {
-        Map<String, Object> itemProperties = Map.of(
-            "subjectId", Map.of("type", "INTEGER"),
-            "date", Map.of("type", "STRING"),
-            "startTime", Map.of("type", "STRING"),
-            "durationMinutes", Map.of("type", "INTEGER"),
-            "topic", Map.of("type", "STRING")
-        );
-
-        Map<String, Object> itemSchema = Map.of(
-            "type", "OBJECT",
-            "properties", itemProperties,
-            "required", List.of("subjectId", "date", "startTime", "durationMinutes", "topic")
-        );
-
-        return Map.of(
-            "type", "ARRAY",
-            "items", itemSchema
-        );
     }
 }

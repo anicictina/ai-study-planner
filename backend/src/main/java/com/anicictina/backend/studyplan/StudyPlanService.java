@@ -88,7 +88,7 @@ public class StudyPlanService {
 
         String prompt =
             promptBuilder.build(subjectContexts, availabilityWindows, user.getPreferredStudyTime(), today);
-        String rawJson = geminiClient.generateJson(prompt);
+        String rawJson = geminiClient.generateJson(prompt, promptBuilder.buildResponseSchema());
         List<RawProposedItem> proposedItems = parseProposedItems(rawJson);
 
         StudyPlanValidationOutcome outcome =

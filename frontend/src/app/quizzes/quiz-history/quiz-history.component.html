@@ -1,0 +1,25 @@
+<h1>Rezultati kvizova</h1>
+
+@if (!loading() && attempts().length === 0) {
+  <p class="empty-state">
+    Još nema rešenih kvizova. Idi na stranicu "Materijali" i generiši kviz iz nekog gradiva.
+  </p>
+}
+
+<div class="attempt-list">
+  @for (attempt of attempts(); track attempt.id) {
+    <mat-card class="attempt-card">
+      <mat-card-content>
+        <div class="attempt-row">
+          <div class="attempt-info">
+            <p class="material-title">{{ attempt.materialTitle }}</p>
+            <p class="date">{{ attempt.attemptedAt.slice(0, 16).replace('T', ' ') }}</p>
+          </div>
+          <mat-chip [class]="scoreClass(attempt)">
+            {{ attempt.correctCount }} / {{ attempt.totalCount }}
+          </mat-chip>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+</div>
