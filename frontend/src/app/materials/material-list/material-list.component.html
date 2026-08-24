@@ -1,0 +1,61 @@
+<div class="header">
+  <h1>Materijali</h1>
+  @if (subjects().length > 0) {
+    <div class="header-actions">
+      <mat-select
+        class="subject-select"
+        [value]="selectedSubjectId()"
+        (selectionChange)="onSubjectChange($event.value)"
+      >
+        @for (subject of subjects(); track subject.id) {
+          <mat-option [value]="subject.id">{{ subject.name }}</mat-option>
+        }
+      </mat-select>
+      <button mat-flat-button color="primary" (click)="openCreateDialog()">
+        <mat-icon>add</mat-icon>
+        Novo gradivo
+      </button>
+    </div>
+  }
+</div>
+
+@if (subjects().length === 0) {
+  <p class="empty-state">
+    Nemaš još dodatih predmeta. <a routerLink="/subjects">Dodaj predmet</a> pre dodavanja gradiva.
+  </p>
+} @else if (!loading() && materials().length === 0) {
+  <p class="empty-state">Još nema dodatog gradiva za ovaj predmet.</p>
+}
+
+<div class="material-grid">
+  @for (material of materials(); track material.id) {
+    <mat-card class="material-card">
+      <mat-card-header>
+        <mat-card-title>{{ material.title }}</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <p class="preview">{{ material.content }}</p>
+
+        <mat-select
+          class="status-select"
+          [value]="material.status"
+          (selectionChange)="changeStatus(material, $event.value)"
+        >
+          <mat-option value="NOT_STARTED">{{ statusLabels['NOT_STARTED'] }}</mat-option>
+          <mat-option value="IN_PROGRESS">{{ statusLabels['IN_PROGRESS'] }}</mat-option>
+          <mat-option value="LEARNED">{{ statusLabels['LEARNED'] }}</mat-option>
+        </mat-select>
+      </mat-card-content>
+
+      <mat-card-actions align="end">
+        <button mat-icon-button matTooltip="Izmeni" (click)="openEditDialog(material)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button matTooltip="Obriši" (click)="remove(material)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  }
+</div>
