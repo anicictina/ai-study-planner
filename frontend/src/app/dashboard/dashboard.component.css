@@ -1,9 +1,75 @@
-h1 {
-  font-size: 1.75rem;
-  font-weight: 500;
-  margin-bottom: 16px;
+.hero {
+  position: relative;
+  height: 220px;
+  border-radius: 20px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  background-image:
+    linear-gradient(120deg, rgba(58, 46, 34, 0.72) 0%, rgba(58, 46, 34, 0.35) 55%, rgba(58, 46, 34, 0.1) 100%),
+    url('/images/dashboard-hero.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 32px;
+  color: #fff;
+}
+
+.hero-overlay h1 {
+  margin: 0 0 8px;
+  font-size: 2.25rem;
+  color: #fff;
+}
+
+.hero-overlay p {
+  margin: 0;
+  font-size: 1.0625rem;
+  opacity: 0.92;
 }
 
 .welcome-card {
   max-width: 640px;
+  margin-bottom: 20px;
+}
+
+.quick-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+  max-width: 720px;
+}
+
+.quick-links a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.quick-link-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px 12px;
+  text-align: center;
+  font-weight: 600;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  cursor: pointer;
+}
+
+.quick-link-card:hover {
+  transform: translateY(-2px);
+}
+
+.quick-link-card mat-icon {
+  color: var(--mat-sys-primary);
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
 }

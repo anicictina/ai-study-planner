@@ -1,4 +1,50 @@
 /* You can add global styles to this file, and also import other style files */
 
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body { margin: 0; font-family: 'Nunito', "Helvetica Neue", sans-serif; }
+
+h1, h2, h3,
+mat-card-title,
+.mat-mdc-dialog-title {
+  font-family: 'Fraunces', 'Georgia', serif !important;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.mat-mdc-card {
+  border-radius: 20px !important;
+  overflow: hidden;
+}
+
+.mat-mdc-dialog-container .mdc-dialog__surface {
+  border-radius: 20px !important;
+}
+
+.mat-mdc-raised-button,
+.mat-mdc-unelevated-button,
+.mat-mdc-outlined-button {
+  border-radius: 999px !important;
+  padding-inline: 20px !important;
+}
+
+.mat-mdc-icon-button {
+  border-radius: 50% !important;
+}
+
+.mat-mdc-form-field .mdc-notched-outline__leading,
+.mat-mdc-form-field .mdc-notched-outline__notch,
+.mat-mdc-form-field .mdc-notched-outline__trailing {
+  border-radius: inherit;
+}
+
+.mat-mdc-text-field-wrapper {
+  border-radius: 14px !important;
+}
+
+.mat-mdc-chip {
+  border-radius: 999px !important;
+}
+
+.mat-toolbar {
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+}

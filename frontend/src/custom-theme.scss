@@ -1,4 +1,3 @@
-
 // Include theming for Angular Material with `mat.theme()`.
 // This Sass mixin will define CSS variables that are used for styling Angular Material
 // components according to the Material 3 design spec.
@@ -9,12 +8,65 @@
 html {
   @include mat.theme((
     color: (
-      primary: mat.$azure-palette,
-      tertiary: mat.$blue-palette,
+      primary: mat.$orange-palette,
+      tertiary: mat.$green-palette,
     ),
-    typography: Roboto,
+    typography: (
+      brand-family: Nunito,
+      plain-family: Nunito,
+    ),
     density: 0,
   ));
+
+  // Custom warm "cozy study" palette, overriding the Material 3 system tokens
+  // above with our own colors so every component (buttons, cards, chips,
+  // toolbar, form fields, ...) picks them up automatically.
+  --mat-sys-primary: #a9744f;
+  --mat-sys-on-primary: #ffffff;
+  --mat-sys-primary-container: #f0dcc5;
+  --mat-sys-on-primary-container: #4a2e12;
+  --mat-sys-inverse-primary: #f0dcc5;
+
+  --mat-sys-secondary: #6e7c5c;
+  --mat-sys-on-secondary: #ffffff;
+  --mat-sys-secondary-container: #dce3cd;
+  --mat-sys-on-secondary-container: #2a331f;
+
+  --mat-sys-tertiary: #b08628;
+  --mat-sys-on-tertiary: #ffffff;
+  --mat-sys-tertiary-container: #f2e1b8;
+  --mat-sys-on-tertiary-container: #3d2e05;
+
+  --mat-sys-error: #b3261e;
+  --mat-sys-on-error: #ffffff;
+  --mat-sys-error-container: #f9dedc;
+  --mat-sys-on-error-container: #410e0b;
+
+  --mat-sys-background: #faf3ea;
+  --mat-sys-on-background: #3a2e22;
+
+  --mat-sys-surface: #fdf9f3;
+  --mat-sys-on-surface: #3a2e22;
+  --mat-sys-surface-variant: #eee2d0;
+  --mat-sys-on-surface-variant: #6b5d4f;
+
+  --mat-sys-surface-container-lowest: #ffffff;
+  --mat-sys-surface-container-low: #fbf6ee;
+  --mat-sys-surface-container: #f5ede0;
+  --mat-sys-surface-container-high: #efe4d3;
+  --mat-sys-surface-container-highest: #e9dec9;
+
+  --mat-sys-outline: #b8a68d;
+  --mat-sys-outline-variant: #dfd3bf;
+
+  --mat-sys-inverse-surface: #3a2e22;
+  --mat-sys-inverse-on-surface: #fbf1e6;
+
+  --mat-sys-corner-small: 10px;
+  --mat-sys-corner-medium: 16px;
+  --mat-sys-corner-large: 20px;
+  --mat-sys-corner-extra-large: 28px;
+  --mat-sys-corner-full: 999px;
 }
 
 body {
@@ -26,7 +78,7 @@ body {
   // Set a default background, font and text colors for the application using
   // Angular Material's system-level CSS variables. Learn more about these
   // variables at https://material.angular.dev/guide/system-variables
-  background-color: var(--mat-sys-surface);
+  background-color: var(--mat-sys-background);
   color: var(--mat-sys-on-surface);
   font: var(--mat-sys-body-medium);
 
