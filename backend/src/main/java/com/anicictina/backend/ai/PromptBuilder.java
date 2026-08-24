@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -88,5 +89,26 @@ public class PromptBuilder {
             case AFTERNOON -> "popodne";
             case EVENING -> "veče";
         };
+    }
+
+    public Map<String, Object> buildResponseSchema() {
+        Map<String, Object> itemProperties = Map.of(
+            "subjectId", Map.of("type", "INTEGER"),
+            "date", Map.of("type", "STRING"),
+            "startTime", Map.of("type", "STRING"),
+            "durationMinutes", Map.of("type", "INTEGER"),
+            "topic", Map.of("type", "STRING")
+        );
+
+        Map<String, Object> itemSchema = Map.of(
+            "type", "OBJECT",
+            "properties", itemProperties,
+            "required", List.of("subjectId", "date", "startTime", "durationMinutes", "topic")
+        );
+
+        return Map.of(
+            "type", "ARRAY",
+            "items", itemSchema
+        );
     }
 }

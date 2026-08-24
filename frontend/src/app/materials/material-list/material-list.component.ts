@@ -6,10 +6,11 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { StudyMaterial } from '../../core/models/material.model';
 import { Subject } from '../../core/models/subject.model';
 import { MaterialService } from '../../core/services/material.service';
+import { QuizService } from '../../core/services/quiz.service';
 import { SubjectService } from '../../core/services/subject.service';
 import { MaterialFormDialogComponent } from '../material-form-dialog/material-form-dialog.component';
 
@@ -38,12 +39,15 @@ const STATUS_LABELS: Record<string, string> = {
 export class MaterialListComponent implements OnInit {
   private readonly materialService = inject(MaterialService);
   private readonly subjectService = inject(SubjectService);
+  private readonly quizService = inject(QuizService);
+  private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
 
   readonly subjects = signal<Subject[]>([]);
   readonly selectedSubjectId = signal<number | null>(null);
   readonly materials = signal<StudyMaterial[]>([]);
   readonly loading = signal(true);
+  readonly generatingQuizFor = signal<number | null>(null);
 
   readonly statusLabels = STATUS_LABELS;
 
@@ -106,5 +110,19 @@ export class MaterialListComponent implements OnInit {
   remove(material: StudyMaterial): void {
     if (!confirm(`Obrisati gradivo "${material.title}"?`)) return;
     this.materialService.delete(material.id).subscribe(() => this.loadMaterials());
+  }
+
+  generateQuiz(material: StudyMaterial): void {
+    this.generatingQuizFor.set(material.id);
+    this.quizService.generate(material.id).subscribe({
+      next: (quiz) => {
+        this.generatingQuizFor.set(null);
+        this.router.navigate(['/quizzes', quiz.id]);
+      },
+      error: (err) => {
+        this.generatingQuizFor.set(null);
+        alert(err?.error?.message ?? 'Generisanje kviza nije uspelo.');
+      }
+    });
   }
 }

@@ -49,6 +49,14 @@
       </mat-card-content>
 
       <mat-card-actions align="end">
+        <button
+          mat-icon-button
+          matTooltip="Generiši kviz"
+          [disabled]="generatingQuizFor() === material.id"
+          (click)="generateQuiz(material)"
+        >
+          <mat-icon>quiz</mat-icon>
+        </button>
         <button mat-icon-button matTooltip="Izmeni" (click)="openEditDialog(material)">
           <mat-icon>edit</mat-icon>
         </button>
