@@ -1,10 +1,42 @@
-<h1>Zdravo, {{ currentUser()?.firstName }} 👋</h1>
+<div class="hero">
+  <div class="hero-overlay">
+    <h1>Zdravo, {{ currentUser()?.firstName }} 👋</h1>
+    <p>Dobrodošla nazad u svoj prostor za učenje.</p>
+  </div>
+</div>
 
 <mat-card class="welcome-card">
   <mat-card-content>
     <p>
-      Uspešno si prijavljena. Ovo je početna tabla (dashboard) — ovde će uskoro stajati tvoj
-      dnevni plan učenja, predstojeći ispiti i napredak, čim implementiramo naredne module.
+      Uspešno si prijavljena. Ovo je početna tabla — ovde će uskoro stajati tvoj dnevni plan
+      učenja, predstojeći ispiti i napredak, čim implementiramo naredne module.
     </p>
   </mat-card-content>
 </mat-card>
+
+<div class="quick-links">
+  <a routerLink="/subjects">
+    <mat-card class="quick-link-card">
+      <mat-icon>menu_book</mat-icon>
+      <span>Predmeti</span>
+    </mat-card>
+  </a>
+  <a routerLink="/exams">
+    <mat-card class="quick-link-card">
+      <mat-icon>event_note</mat-icon>
+      <span>Ispiti</span>
+    </mat-card>
+  </a>
+  <a routerLink="/study-plan">
+    <mat-card class="quick-link-card">
+      <mat-icon>auto_awesome</mat-icon>
+      <span>AI Plan</span>
+    </mat-card>
+  </a>
+  <a routerLink="/calendar">
+    <mat-card class="quick-link-card">
+      <mat-icon>calendar_month</mat-icon>
+      <span>Kalendar</span>
+    </mat-card>
+  </a>
+</div>
