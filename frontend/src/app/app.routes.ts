@@ -6,6 +6,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
 import { ExamListComponent } from './exams/exam-list/exam-list.component';
+import { MaterialListComponent } from './materials/material-list/material-list.component';
 import { ProfileComponent } from './profile/profile.component';
 import { LayoutComponent } from './shared/layout/layout.component';
 import { StudyPlanComponent } from './study-plan/study-plan.component';
@@ -24,6 +25,7 @@ export const routes: Routes = [
       { path: 'subjects', component: SubjectListComponent },
       { path: 'exams', component: ExamListComponent },
       { path: 'study-plan', component: StudyPlanComponent },
+      { path: 'materials', component: MaterialListComponent },
       { path: 'study-sessions', component: StudySessionListComponent },
       { path: 'calendar', component: CalendarComponent },
       { path: 'profile', component: ProfileComponent },

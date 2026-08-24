@@ -1,0 +1,13 @@
+.form-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 420px;
+  max-width: 560px;
+}
+
+.error-message {
+  color: var(--mat-sys-error);
+  font-size: 0.875rem;
+  margin: 0 0 4px;
+}

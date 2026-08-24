@@ -1,0 +1,36 @@
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { MaterialRequest, MaterialStatus, StudyMaterial } from '../models/material.model';
+
+@Injectable({ providedIn: 'root' })
+export class MaterialService {
+  private readonly apiUrl = `${environment.apiUrl}/materials`;
+
+  constructor(private readonly http: HttpClient) {}
+
+  getAllForSubject(subjectId: number): Observable<StudyMaterial[]> {
+    return this.http.get<StudyMaterial[]>(`${this.apiUrl}/subject/${subjectId}`);
+  }
+
+  getOne(id: number): Observable<StudyMaterial> {
+    return this.http.get<StudyMaterial>(`${this.apiUrl}/${id}`);
+  }
+
+  create(request: MaterialRequest): Observable<StudyMaterial> {
+    return this.http.post<StudyMaterial>(this.apiUrl, request);
+  }
+
+  update(id: number, request: MaterialRequest): Observable<StudyMaterial> {
+    return this.http.put<StudyMaterial>(`${this.apiUrl}/${id}`, request);
+  }
+
+  updateStatus(id: number, status: MaterialStatus): Observable<StudyMaterial> {
+    return this.http.patch<StudyMaterial>(`${this.apiUrl}/${id}/status`, { status });
+  }
+
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+}

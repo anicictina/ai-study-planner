@@ -1,0 +1,37 @@
+<h2 mat-dialog-title>{{ isEditMode ? 'Izmeni gradivo' : 'Novo gradivo' }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <mat-dialog-content class="form-content">
+    <mat-form-field appearance="outline">
+      <mat-label>Naslov</mat-label>
+      <input matInput formControlName="title" placeholder="npr. Normalizacija baza podataka" />
+      @if (form.controls.title.hasError('required')) {
+        <mat-error>Naslov je obavezan</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Tekst gradiva</mat-label>
+      <textarea
+        matInput
+        formControlName="content"
+        rows="10"
+        placeholder="Unesi ili nalepi tekst gradiva iz kojeg će AI kasnije generisati kviz..."
+      ></textarea>
+      @if (form.controls.content.hasError('required')) {
+        <mat-error>Tekst gradiva je obavezan</mat-error>
+      }
+    </mat-form-field>
+
+    @if (errorMessage()) {
+      <p class="error-message">{{ errorMessage() }}</p>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="cancel()">Otkaži</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="saving()">
+      {{ isEditMode ? 'Sačuvaj' : 'Dodaj' }}
+    </button>
+  </mat-dialog-actions>
+</form>
