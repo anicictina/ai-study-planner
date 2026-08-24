@@ -1,0 +1,130 @@
+<h1>Plan učenja</h1>
+
+<mat-card class="section-card">
+  <mat-card-header>
+    <mat-card-title>Generiši AI plan</mat-card-title>
+    <mat-card-subtitle>
+      Izaberi predmete (ili ostavi prazno za sve aktivne predmete) i pokreni generisanje
+    </mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="subject-picker">
+      @for (subject of subjects(); track subject.id) {
+        <mat-checkbox
+          [checked]="selectedSubjectIds().has(subject.id)"
+          (change)="toggleSubject(subject.id)"
+        >
+          <span class="color-dot" [style.background-color]="subject.color"></span>
+          {{ subject.name }}
+        </mat-checkbox>
+      }
+      @if (subjects().length === 0) {
+        <p class="empty-state">
+          Nemaš aktivnih predmeta. Dodaj predmet na stranici "Predmeti" pre generisanja plana.
+        </p>
+      }
+    </div>
+
+    @if (errorMessage()) {
+      <p class="error-message">{{ errorMessage() }}</p>
+    }
+
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="generate()"
+      [disabled]="generating() || subjects().length === 0"
+    >
+      @if (generating()) {
+        <mat-spinner diameter="20" />
+        <span>AI generiše plan...</span>
+      } @else {
+        <span>{{ hasAcceptedPlanBefore() ? 'Rekalkuliši plan' : 'Generiši plan učenja' }}</span>
+      }
+    </button>
+  </mat-card-content>
+</mat-card>
+
+@if (!loadingPlan() && currentPlan(); as plan) {
+  <mat-card class="section-card">
+    <mat-card-header>
+      <mat-card-title>Predloženi plan</mat-card-title>
+      <mat-card-subtitle>
+        Generisan: {{ plan.generatedAt.slice(0, 16).replace('T', ' ') }}
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <mat-chip class="status-chip" [class.status-accepted]="plan.status === 'ACCEPTED'">
+        {{ statusLabels[plan.status] }}
+      </mat-chip>
+
+      @if (plan.rejectedItemsCount > 0) {
+        <div class="rejected-notice">
+          <mat-icon>info</mat-icon>
+          <div>
+            <p>
+              AI je predložio {{ plan.items.length + plan.rejectedItemsCount }} termina,
+              {{ plan.rejectedItemsCount }} je odbačeno jer nije prošlo validaciju
+              (npr. van raspoloživog vremena ili preklapanje).
+            </p>
+            @if (plan.validationNotes) {
+              <p class="validation-notes">{{ plan.validationNotes }}</p>
+            }
+          </div>
+        </div>
+      }
+
+      <div class="plan-items">
+        @for (group of groupedItems(); track group.date) {
+          <div class="date-group">
+            <h3>{{ group.date }}</h3>
+            @for (item of group.items; track item.id) {
+              <div class="plan-item">
+                <span class="color-dot" [style.background-color]="item.subjectColor"></span>
+                <span class="time">{{ item.startTime.slice(0, 5) }}</span>
+                <span class="subject">{{ item.subjectName }}</span>
+                <span class="topic">{{ item.topic }}</span>
+                <span class="duration">{{ item.durationMinutes }} min</span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      @if (plan.status === 'PENDING') {
+        <div class="plan-actions">
+          <button mat-flat-button color="primary" (click)="accept()" [disabled]="actionInProgress()">
+            Prihvati plan
+          </button>
+          <button mat-button (click)="discard()" [disabled]="actionInProgress()">Odbaci</button>
+        </div>
+      } @else if (plan.status === 'ACCEPTED') {
+        <p class="accepted-notice">
+          Plan je prihvaćen i sesije su ubačene u kalendar.
+          <a routerLink="/calendar">Pogledaj kalendar</a>
+        </p>
+      }
+    </mat-card-content>
+  </mat-card>
+}
+
+@if (history().length > 0) {
+  <mat-card class="section-card">
+    <mat-card-header>
+      <mat-card-title>Istorija generisanih planova</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="history-list">
+        @for (plan of history(); track plan.id) {
+          <div class="history-item">
+            <span>{{ plan.generatedAt.slice(0, 16).replace('T', ' ') }}</span>
+            <mat-chip>{{ statusLabels[plan.status] }}</mat-chip>
+            <span>{{ plan.items.length }} termina</span>
+          </div>
+        }
+      </div>
+    </mat-card-content>
+  </mat-card>
+}
