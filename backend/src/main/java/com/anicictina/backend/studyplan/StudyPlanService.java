@@ -32,6 +32,7 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -121,14 +122,14 @@ public class StudyPlanService {
     public Optional<StudyPlanResponse> getCurrent() {
         User user = currentUserProvider.getCurrentUser();
         return studyPlanRepository.findFirstByUserIdOrderByGeneratedAtDesc(user.getId())
-            .map(StudyPlanResponse::from);
+            .map(this::toResponse);
     }
 
     @Transactional(readOnly = true)
     public List<StudyPlanResponse> getHistory() {
         User user = currentUserProvider.getCurrentUser();
         return studyPlanRepository.findByUserIdOrderByGeneratedAtDesc(user.getId()).stream()
-            .map(StudyPlanResponse::from)
+            .map(this::toResponse)
             .toList();
     }
 
@@ -152,10 +153,11 @@ public class StudyPlanService {
                 .activityType(ActivityType.READING)
                 .build();
             studySessionRepository.save(session);
+            item.setLinkedSessionId(session.getId());
         }
 
         plan.setStatus(StudyPlanStatus.ACCEPTED);
-        return StudyPlanResponse.from(plan);
+        return toResponse(plan);
     }
 
     @Transactional
@@ -168,6 +170,22 @@ public class StudyPlanService {
 
         plan.setStatus(StudyPlanStatus.DISCARDED);
         return StudyPlanResponse.from(plan);
+    }
+
+    private StudyPlanResponse toResponse(StudyPlan plan) {
+        if (plan.getStatus() != StudyPlanStatus.ACCEPTED) {
+            return StudyPlanResponse.from(plan);
+        }
+
+        List<Long> sessionIds = plan.getItems().stream()
+            .map(StudyPlanItem::getLinkedSessionId)
+            .filter(Objects::nonNull)
+            .toList();
+
+        Map<Long, Boolean> completedBySessionId = studySessionRepository.findAllById(sessionIds).stream()
+            .collect(Collectors.toMap(StudySession::getId, StudySession::isCompleted));
+
+        return StudyPlanResponse.fromAccepted(plan, completedBySessionId, LocalDate.now());
     }
 
     private StudyPlan getOwnedPlan(Long id) {

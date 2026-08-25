@@ -60,6 +60,74 @@ h1 {
   opacity: 0.85;
 }
 
+.progress-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.progress-track {
+  flex: 1;
+  max-width: 240px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--mat-sys-surface-container-high);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--mat-sys-primary);
+  border-radius: 999px;
+  transition: width 0.2s ease;
+}
+
+.progress-text {
+  font-size: 0.8125rem;
+  color: var(--mat-sys-on-surface-variant);
+  white-space: nowrap;
+}
+
+.overdue-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fde3e3;
+  color: #7a1f1a;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 0.875rem;
+}
+
+.overdue-banner span {
+  flex: 1;
+}
+
+.item-status-icon {
+  flex-shrink: 0;
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.plan-item.item-completed {
+  opacity: 0.65;
+}
+
+.plan-item.item-completed .topic {
+  text-decoration: line-through;
+}
+
+.plan-item.item-completed .item-status-icon {
+  color: #1e6b1e;
+}
+
+.plan-item.item-overdue .item-status-icon {
+  color: #b3261e;
+}
+
 .plan-items {
   display: flex;
   flex-direction: column;

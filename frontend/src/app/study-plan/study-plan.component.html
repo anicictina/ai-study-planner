@@ -76,17 +76,53 @@
         </div>
       }
 
+      @if (plan.status === 'ACCEPTED' && plan.progress; as progress) {
+        <div class="progress-summary">
+          <div class="progress-track">
+            <div
+              class="progress-fill"
+              [style.width.%]="(progress.completedItems / progress.totalItems) * 100"
+            ></div>
+          </div>
+          <span class="progress-text">
+            {{ progress.completedItems }} / {{ progress.totalItems }} sesija završeno
+          </span>
+        </div>
+
+        @if (progress.overdueItems > 0) {
+          <div class="overdue-banner">
+            <mat-icon>schedule</mat-icon>
+            <span>
+              Zaostaješ za planom — {{ progress.overdueItems }}
+              {{ progress.overdueItems === 1 ? 'sesija je propuštena' : 'sesije su propuštene' }}.
+            </span>
+            <button mat-flat-button color="primary" (click)="generate()" [disabled]="generating()">
+              @if (generating()) {
+                <mat-spinner diameter="18" />
+              } @else {
+                Rekalkuliši plan
+              }
+            </button>
+          </div>
+        }
+      }
+
       <div class="plan-items">
         @for (group of groupedItems(); track group.date) {
           <div class="date-group">
             <h3>{{ group.date }}</h3>
             @for (item of group.items; track item.id) {
-              <div class="plan-item">
+              <div class="plan-item" [class.item-completed]="item.completed === true" [class.item-overdue]="item.completed === false && isPast(item.itemDate)">
                 <span class="color-dot" [style.background-color]="item.subjectColor"></span>
                 <span class="time">{{ item.startTime.slice(0, 5) }}</span>
                 <span class="subject">{{ item.subjectName }}</span>
                 <span class="topic">{{ item.topic }}</span>
                 <span class="duration">{{ item.durationMinutes }} min</span>
+                @if (item.completed === true) {
+                  <mat-icon class="item-status-icon">check_circle</mat-icon>
+                } @else if (item.completed === false && isPast(item.itemDate)) {
+                  <mat-icon class="item-status-icon">error</mat-icon>
+                }
               </div>
             }
           </div>
