@@ -1,0 +1,74 @@
+<h2 mat-dialog-title>AI sažetak — {{ data.materialTitle }}</h2>
+
+<mat-dialog-content class="summary-content">
+  @if (loading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="32" />
+    </div>
+  } @else if (generating()) {
+    <div class="loading-state">
+      <mat-spinner diameter="32" />
+      <p>AI generiše sažetak...</p>
+    </div>
+  } @else if (summary(); as s) {
+    <section class="summary-section">
+      <p class="summary-text">{{ s.summaryText }}</p>
+    </section>
+
+    @if (s.keyTerms.length > 0) {
+      <section class="summary-section">
+        <h3>Ključni pojmovi</h3>
+        <mat-chip-set>
+          @for (term of s.keyTerms; track term) {
+            <mat-chip>{{ term }}</mat-chip>
+          }
+        </mat-chip-set>
+      </section>
+    }
+
+    @if (s.keyDefinitions.length > 0) {
+      <section class="summary-section">
+        <h3>Ključne definicije</h3>
+        <dl class="definitions-list">
+          @for (def of s.keyDefinitions; track def.term) {
+            <dt>{{ def.term }}</dt>
+            <dd>{{ def.definition }}</dd>
+          }
+        </dl>
+      </section>
+    }
+
+    @if (s.practiceQuestions.length > 0) {
+      <section class="summary-section">
+        <h3>Potencijalna pitanja za ispit</h3>
+        <ul class="questions-list">
+          @for (question of s.practiceQuestions; track question) {
+            <li>{{ question }}</li>
+          }
+        </ul>
+      </section>
+    }
+
+    @if (errorMessage()) {
+      <p class="error-message">{{ errorMessage() }}</p>
+    }
+
+    <button mat-stroked-button (click)="generate()">
+      <mat-icon>refresh</mat-icon>
+      Regeneriši sažetak
+    </button>
+  } @else {
+    <p class="empty-state">Za ovo gradivo još nije generisan sažetak.</p>
+    @if (errorMessage()) {
+      <p class="error-message">{{ errorMessage() }}</p>
+    }
+    <button mat-flat-button color="primary" (click)="generate()">
+      <mat-icon>auto_awesome</mat-icon>
+      Generiši sažetak
+    </button>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()">Zatvori</button>
+</mat-dialog-actions>

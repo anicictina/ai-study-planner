@@ -1,13 +1,20 @@
 package com.anicictina.backend.material;
 
+import com.anicictina.backend.ai.AIServiceException;
+import com.anicictina.backend.ai.GeminiClient;
+import com.anicictina.backend.ai.RawMaterialSummary;
+import com.anicictina.backend.ai.SummaryPromptBuilder;
+import com.anicictina.backend.ai.SummaryValidator;
 import com.anicictina.backend.common.exception.ResourceNotFoundException;
 import com.anicictina.backend.material.dto.MaterialRequest;
 import com.anicictina.backend.material.dto.MaterialResponse;
 import com.anicictina.backend.material.dto.MaterialStatusUpdateRequest;
+import com.anicictina.backend.material.dto.MaterialSummaryResponse;
 import com.anicictina.backend.security.CurrentUserProvider;
 import com.anicictina.backend.subject.Subject;
 import com.anicictina.backend.subject.SubjectRepository;
 import com.anicictina.backend.user.User;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.ValidationException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -25,8 +32,13 @@ import org.springframework.web.multipart.MultipartFile;
 public class MaterialService {
 
     private final MaterialRepository materialRepository;
+    private final MaterialSummaryRepository materialSummaryRepository;
     private final SubjectRepository subjectRepository;
     private final CurrentUserProvider currentUserProvider;
+    private final SummaryPromptBuilder summaryPromptBuilder;
+    private final GeminiClient geminiClient;
+    private final SummaryValidator summaryValidator;
+    private final ObjectMapper objectMapper;
 
     @Transactional(readOnly = true)
     public List<MaterialResponse> findAllForSubject(Long subjectId) {
@@ -105,6 +117,45 @@ public class MaterialService {
 
         materialRepository.save(material);
         return MaterialResponse.from(material);
+    }
+
+    @Transactional
+    public MaterialSummaryResponse generateSummary(Long id) {
+        StudyMaterial material = getOwnedMaterial(id);
+
+        String prompt = summaryPromptBuilder.build(material.getTitle(), material.getContent());
+        String rawJson = geminiClient.generateJson(prompt, summaryPromptBuilder.buildResponseSchema());
+        RawMaterialSummary raw = parseRawSummary(rawJson);
+        RawMaterialSummary validated = summaryValidator.validate(raw);
+
+        MaterialSummary summary = materialSummaryRepository.findByMaterialId(id)
+            .orElseGet(() -> MaterialSummary.builder().material(material).build());
+
+        summary.setSummaryText(validated.summaryText());
+        summary.setKeyTerms(validated.keyTerms());
+        summary.setKeyDefinitions(validated.keyDefinitions().stream()
+            .map(def -> new KeyDefinition(def.term(), def.definition()))
+            .toList());
+        summary.setPracticeQuestions(validated.practiceQuestions());
+
+        materialSummaryRepository.save(summary);
+        return MaterialSummaryResponse.from(summary);
+    }
+
+    @Transactional(readOnly = true)
+    public MaterialSummaryResponse getSummary(Long id) {
+        getOwnedMaterial(id);
+        MaterialSummary summary = materialSummaryRepository.findByMaterialId(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Summary not found"));
+        return MaterialSummaryResponse.from(summary);
+    }
+
+    private RawMaterialSummary parseRawSummary(String rawJson) {
+        try {
+            return objectMapper.readValue(rawJson, RawMaterialSummary.class);
+        } catch (IOException e) {
+            throw new AIServiceException("AI servis je vratio neočekivan format odgovora.", e);
+        }
     }
 
     private String extractText(MultipartFile file) {

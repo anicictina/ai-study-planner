@@ -3,6 +3,7 @@ package com.anicictina.backend.material;
 import com.anicictina.backend.material.dto.MaterialRequest;
 import com.anicictina.backend.material.dto.MaterialResponse;
 import com.anicictina.backend.material.dto.MaterialStatusUpdateRequest;
+import com.anicictina.backend.material.dto.MaterialSummaryResponse;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -68,5 +69,15 @@ public class MaterialController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         materialService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/summary")
+    public MaterialSummaryResponse generateSummary(@PathVariable Long id) {
+        return materialService.generateSummary(id);
+    }
+
+    @GetMapping("/{id}/summary")
+    public MaterialSummaryResponse getSummary(@PathVariable Long id) {
+        return materialService.getSummary(id);
     }
 }

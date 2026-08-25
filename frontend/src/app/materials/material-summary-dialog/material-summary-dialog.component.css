@@ -1,0 +1,60 @@
+.summary-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 420px;
+  max-width: 560px;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 32px 0;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.summary-section h3 {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+.summary-text {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.definitions-list {
+  margin: 0;
+}
+
+.definitions-list dt {
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+.definitions-list dd {
+  margin: 2px 0 0;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.questions-list {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.questions-list li {
+  margin-bottom: 6px;
+}
+
+.empty-state {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.error-message {
+  color: var(--mat-sys-error);
+  font-size: 0.875rem;
+  margin: 0;
+}

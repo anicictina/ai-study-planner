@@ -13,6 +13,7 @@ import { MaterialService } from '../../core/services/material.service';
 import { QuizService } from '../../core/services/quiz.service';
 import { SubjectService } from '../../core/services/subject.service';
 import { MaterialFormDialogComponent } from '../material-form-dialog/material-form-dialog.component';
+import { MaterialSummaryDialogComponent } from '../material-summary-dialog/material-summary-dialog.component';
 import { MaterialUploadDialogComponent } from '../material-upload-dialog/material-upload-dialog.component';
 
 const STATUS_LABELS: Record<string, string> = {
@@ -121,6 +122,12 @@ export class MaterialListComponent implements OnInit {
   remove(material: StudyMaterial): void {
     if (!confirm(`Obrisati gradivo "${material.title}"?`)) return;
     this.materialService.delete(material.id).subscribe(() => this.loadMaterials());
+  }
+
+  openSummaryDialog(material: StudyMaterial): void {
+    this.dialog.open(MaterialSummaryDialogComponent, {
+      data: { materialId: material.id, materialTitle: material.title }
+    });
   }
 
   generateQuiz(material: StudyMaterial): void {
