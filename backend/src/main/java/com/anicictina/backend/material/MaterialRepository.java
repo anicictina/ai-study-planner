@@ -8,5 +8,7 @@ public interface MaterialRepository extends JpaRepository<StudyMaterial, Long> {
 
     List<StudyMaterial> findBySubjectIdOrderByCreatedAtDesc(Long subjectId);
 
+    List<StudyMaterial> findBySubjectUserId(Long userId);
+
     Optional<StudyMaterial> findByIdAndSubjectUserId(Long id, Long userId);
 }
