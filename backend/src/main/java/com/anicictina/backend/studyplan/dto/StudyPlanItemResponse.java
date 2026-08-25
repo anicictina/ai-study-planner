@@ -14,10 +14,15 @@ public record StudyPlanItemResponse(
     LocalDate itemDate,
     LocalTime startTime,
     Integer durationMinutes,
-    String topic
+    String topic,
+    Boolean completed
 ) {
 
     public static StudyPlanItemResponse from(StudyPlanItem item) {
+        return from(item, null);
+    }
+
+    public static StudyPlanItemResponse from(StudyPlanItem item, Boolean completed) {
         return StudyPlanItemResponse.builder()
             .id(item.getId())
             .subjectId(item.getSubject().getId())
@@ -27,6 +32,7 @@ public record StudyPlanItemResponse(
             .startTime(item.getStartTime())
             .durationMinutes(item.getDurationMinutes())
             .topic(item.getTopic())
+            .completed(completed)
             .build();
     }
 }

@@ -9,6 +9,13 @@ export interface StudyPlanItem {
   startTime: string;
   durationMinutes: number;
   topic: string | null;
+  completed: boolean | null;
+}
+
+export interface StudyPlanProgress {
+  totalItems: number;
+  completedItems: number;
+  overdueItems: number;
 }
 
 export interface StudyPlan {
@@ -18,6 +25,7 @@ export interface StudyPlan {
   rejectedItemsCount: number;
   validationNotes: string | null;
   items: StudyPlanItem[];
+  progress: StudyPlanProgress | null;
 }
 
 export interface StudyPlanGenerateRequest {

@@ -49,4 +49,11 @@ public class StudyPlanItem {
     private Integer durationMinutes;
 
     private String topic;
+
+    /**
+     * Id of the StudySession created when this item's plan was accepted.
+     * Kept as a plain id (not a JPA relation) to avoid a package cycle
+     * between studyplan and studysession.
+     */
+    private Long linkedSessionId;
 }

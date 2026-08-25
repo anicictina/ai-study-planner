@@ -101,6 +101,12 @@ export class StudyPlanComponent implements OnInit {
     this.selectedSubjectIds.set(current);
   }
 
+  isPast(dateStr: string): boolean {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return new Date(dateStr) < today;
+  }
+
   generate(): void {
     this.generating.set(true);
     this.errorMessage.set(null);
