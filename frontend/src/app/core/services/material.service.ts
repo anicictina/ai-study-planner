@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { MaterialRequest, MaterialStatus, StudyMaterial } from '../models/material.model';
+import { MaterialRequest, MaterialStatus, MaterialSummary, StudyMaterial } from '../models/material.model';
 
 @Injectable({ providedIn: 'root' })
 export class MaterialService {
@@ -41,5 +41,13 @@ export class MaterialService {
     formData.append('file', file);
 
     return this.http.post<StudyMaterial>(`${this.apiUrl}/upload`, formData);
+  }
+
+  generateSummary(id: number): Observable<MaterialSummary> {
+    return this.http.post<MaterialSummary>(`${this.apiUrl}/${id}/summary`, {});
+  }
+
+  getSummary(id: number): Observable<MaterialSummary> {
+    return this.http.get<MaterialSummary>(`${this.apiUrl}/${id}/summary`);
   }
 }

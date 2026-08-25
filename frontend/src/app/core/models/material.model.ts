@@ -15,3 +15,18 @@ export interface MaterialRequest {
   title: string;
   content: string;
 }
+
+export interface KeyDefinition {
+  term: string;
+  definition: string;
+}
+
+export interface MaterialSummary {
+  id: number;
+  materialId: number;
+  summaryText: string;
+  keyTerms: string[];
+  keyDefinitions: KeyDefinition[];
+  practiceQuestions: string[];
+  generatedAt: string;
+}
