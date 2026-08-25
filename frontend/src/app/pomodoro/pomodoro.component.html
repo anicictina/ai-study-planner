@@ -1,0 +1,90 @@
+<h1>Pomodoro tehnika</h1>
+
+<mat-card class="section-card timer-card">
+  <mat-card-content>
+    <div class="phase-label">{{ phaseLabel() }}</div>
+
+    <div class="timer-display">
+      <div class="timer-ring">
+        <div class="timer-fill" [style.background]="'conic-gradient(var(--mat-sys-primary) ' + progressPercent() + '%, var(--mat-sys-surface-container-high) 0)'"></div>
+        <div class="timer-inner">
+          <span class="timer-text">{{ minutes() | number: '2.0-0' }}:{{ seconds() | number: '2.0-0' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="timer-controls">
+      @if (!isRunning()) {
+        <button mat-flat-button color="primary" (click)="start()">
+          <mat-icon>play_arrow</mat-icon>
+          {{ phase() === 'IDLE' ? 'Počni' : 'Nastavi' }}
+        </button>
+      } @else {
+        <button mat-flat-button color="primary" (click)="pause()">
+          <mat-icon>pause</mat-icon>
+          Pauziraj
+        </button>
+      }
+      <button mat-stroked-button (click)="skip()" [disabled]="phase() === 'IDLE'">
+        <mat-icon>skip_next</mat-icon>
+        Preskoči
+      </button>
+      <button mat-stroked-button (click)="reset()">
+        <mat-icon>restart_alt</mat-icon>
+        Resetuj
+      </button>
+    </div>
+
+    <div class="cycle-summary">
+      Završeni radni ciklusi danas: <strong>{{ completedCycles() }}</strong>
+      &nbsp;·&nbsp;
+      Fokusirano vreme: <strong>{{ totalFocusedMinutesToday() }} min</strong>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<mat-card class="section-card">
+  <mat-card-header>
+    <mat-card-title>Podešavanja</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <div class="settings-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Predmet</mat-label>
+        <mat-select [ngModel]="selectedSubjectId()" (ngModelChange)="selectedSubjectId.set($event)">
+          @for (subject of subjects(); track subject.id) {
+            <mat-option [value]="subject.id">{{ subject.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Tema (opciono)</mat-label>
+        <input matInput [ngModel]="topic()" (ngModelChange)="topic.set($event)" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Rad (min)</mat-label>
+        <input matInput type="number" min="1" [ngModel]="workMinutes()" (ngModelChange)="workMinutes.set($event)" [disabled]="phase() !== 'IDLE'" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Kratka pauza (min)</mat-label>
+        <input matInput type="number" min="1" [ngModel]="shortBreakMinutes()" (ngModelChange)="shortBreakMinutes.set($event)" [disabled]="phase() !== 'IDLE'" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Duga pauza (min)</mat-label>
+        <input matInput type="number" min="1" [ngModel]="longBreakMinutes()" (ngModelChange)="longBreakMinutes.set($event)" [disabled]="phase() !== 'IDLE'" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Ciklusa do duge pauze</mat-label>
+        <input matInput type="number" min="1" [ngModel]="cyclesBeforeLongBreak()" (ngModelChange)="cyclesBeforeLongBreak.set($event)" [disabled]="phase() !== 'IDLE'" />
+      </mat-form-field>
+    </div>
+    @if (phase() !== 'IDLE') {
+      <p class="settings-hint">Podešavanja se mogu menjati samo pre početka tajmera. Resetuj da ih promeniš.</p>
+    }
+  </mat-card-content>
+</mat-card>
