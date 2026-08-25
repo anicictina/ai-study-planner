@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/materials")
@@ -38,6 +40,15 @@ public class MaterialController {
     @PostMapping
     public ResponseEntity<MaterialResponse> create(@Valid @RequestBody MaterialRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(materialService.create(request));
+    }
+
+    @PostMapping("/upload")
+    public ResponseEntity<MaterialResponse> uploadFile(
+        @RequestParam Long subjectId,
+        @RequestParam(required = false) String title,
+        @RequestParam MultipartFile file
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(materialService.uploadFile(subjectId, title, file));
     }
 
     @PutMapping("/{id}")

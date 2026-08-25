@@ -33,4 +33,13 @@ export class MaterialService {
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+
+  uploadFile(subjectId: number, title: string | null, file: File): Observable<StudyMaterial> {
+    const formData = new FormData();
+    formData.append('subjectId', String(subjectId));
+    if (title) formData.append('title', title);
+    formData.append('file', file);
+
+    return this.http.post<StudyMaterial>(`${this.apiUrl}/upload`, formData);
+  }
 }

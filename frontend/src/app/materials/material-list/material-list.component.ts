@@ -13,6 +13,7 @@ import { MaterialService } from '../../core/services/material.service';
 import { QuizService } from '../../core/services/quiz.service';
 import { SubjectService } from '../../core/services/subject.service';
 import { MaterialFormDialogComponent } from '../material-form-dialog/material-form-dialog.component';
+import { MaterialUploadDialogComponent } from '../material-upload-dialog/material-upload-dialog.component';
 
 const STATUS_LABELS: Record<string, string> = {
   NOT_STARTED: 'Nije početo',
@@ -87,6 +88,16 @@ export class MaterialListComponent implements OnInit {
     if (!subjectId) return;
 
     const ref = this.dialog.open(MaterialFormDialogComponent, { data: { subjectId } });
+    ref.afterClosed().subscribe((result) => {
+      if (result) this.loadMaterials();
+    });
+  }
+
+  openUploadDialog(): void {
+    const subjectId = this.selectedSubjectId();
+    if (!subjectId) return;
+
+    const ref = this.dialog.open(MaterialUploadDialogComponent, { data: { subjectId } });
     ref.afterClosed().subscribe((result) => {
       if (result) this.loadMaterials();
     });
