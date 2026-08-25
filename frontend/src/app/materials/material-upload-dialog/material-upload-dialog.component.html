@@ -1,0 +1,33 @@
+<h2 mat-dialog-title>Otpremi gradivo</h2>
+
+<mat-dialog-content class="form-content">
+  <mat-form-field appearance="outline">
+    <mat-label>Naslov (opciono)</mat-label>
+    <input matInput [(ngModel)]="title" placeholder="Ako ostaviš prazno, koristi se naziv fajla" />
+  </mat-form-field>
+
+  <label class="file-drop" for="file-input">
+    <mat-icon>upload_file</mat-icon>
+    @if (selectedFile(); as file) {
+      <span>{{ file.name }}</span>
+    } @else {
+      <span>Klikni da izabereš PDF ili TXT fajl</span>
+    }
+  </label>
+  <input id="file-input" type="file" accept=".pdf,.txt" (change)="onFileSelected($event)" hidden />
+
+  @if (errorMessage()) {
+    <p class="error-message">{{ errorMessage() }}</p>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">Otkaži</button>
+  <button mat-flat-button color="primary" [disabled]="uploading()" (click)="submit()">
+    @if (uploading()) {
+      Otpremanje...
+    } @else {
+      Otpremi
+    }
+  </button>
+</mat-dialog-actions>

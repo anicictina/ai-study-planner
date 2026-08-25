@@ -8,10 +8,17 @@ import com.anicictina.backend.security.CurrentUserProvider;
 import com.anicictina.backend.subject.Subject;
 import com.anicictina.backend.subject.SubjectRepository;
 import com.anicictina.backend.user.User;
+import jakarta.validation.ValidationException;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -73,6 +80,59 @@ public class MaterialService {
     public void delete(Long id) {
         StudyMaterial material = getOwnedMaterial(id);
         materialRepository.delete(material);
+    }
+
+    @Transactional
+    public MaterialResponse uploadFile(Long subjectId, String title, MultipartFile file) {
+        User user = currentUserProvider.getCurrentUser();
+        Subject subject = getOwnedSubject(subjectId, user);
+
+        String extractedText = extractText(file);
+        if (extractedText.isBlank()) {
+            throw new ValidationException("Nije moguće izvući tekst iz ovog fajla.");
+        }
+
+        String resolvedTitle = (title != null && !title.isBlank())
+            ? title.trim()
+            : stripExtension(file.getOriginalFilename());
+
+        StudyMaterial material = StudyMaterial.builder()
+            .subject(subject)
+            .title(resolvedTitle)
+            .content(extractedText.trim())
+            .status(MaterialStatus.NOT_STARTED)
+            .build();
+
+        materialRepository.save(material);
+        return MaterialResponse.from(material);
+    }
+
+    private String extractText(MultipartFile file) {
+        String filename = file.getOriginalFilename() != null ? file.getOriginalFilename().toLowerCase() : "";
+
+        try {
+            if (filename.endsWith(".pdf")) {
+                try (PDDocument document = Loader.loadPDF(file.getBytes())) {
+                    return new PDFTextStripper().getText(document);
+                }
+            }
+
+            if (filename.endsWith(".txt")) {
+                return new String(file.getBytes(), StandardCharsets.UTF_8);
+            }
+        } catch (IOException e) {
+            throw new ValidationException("Neuspešno čitanje fajla.");
+        }
+
+        throw new ValidationException("Podržani su samo PDF i TXT fajlovi.");
+    }
+
+    private String stripExtension(String filename) {
+        if (filename == null || filename.isBlank()) {
+            return "Otpremljeno gradivo";
+        }
+        int dotIndex = filename.lastIndexOf('.');
+        return dotIndex > 0 ? filename.substring(0, dotIndex) : filename;
     }
 
     private StudyMaterial getOwnedMaterial(Long id) {

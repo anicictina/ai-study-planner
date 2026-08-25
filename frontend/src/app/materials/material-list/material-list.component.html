@@ -11,6 +11,10 @@
           <mat-option [value]="subject.id">{{ subject.name }}</mat-option>
         }
       </mat-select>
+      <button mat-stroked-button (click)="openUploadDialog()">
+        <mat-icon>upload_file</mat-icon>
+        Otpremi fajl
+      </button>
       <button mat-flat-button color="primary" (click)="openCreateDialog()">
         <mat-icon>add</mat-icon>
         Novo gradivo
