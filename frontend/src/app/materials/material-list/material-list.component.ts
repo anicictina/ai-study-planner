@@ -5,10 +5,12 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router, RouterLink } from '@angular/router';
 import { StudyMaterial } from '../../core/models/material.model';
 import { Subject } from '../../core/models/subject.model';
+import { ConfirmDialogService } from '../../core/services/confirm-dialog.service';
 import { MaterialService } from '../../core/services/material.service';
 import { QuizService } from '../../core/services/quiz.service';
 import { SubjectService } from '../../core/services/subject.service';
@@ -44,6 +46,8 @@ export class MaterialListComponent implements OnInit {
   private readonly quizService = inject(QuizService);
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
+  private readonly confirmDialogService = inject(ConfirmDialogService);
+  private readonly snackBar = inject(MatSnackBar);
 
   readonly subjects = signal<Subject[]>([]);
   readonly selectedSubjectId = signal<number | null>(null);
@@ -120,8 +124,17 @@ export class MaterialListComponent implements OnInit {
   }
 
   remove(material: StudyMaterial): void {
-    if (!confirm(`Obrisati gradivo "${material.title}"?`)) return;
-    this.materialService.delete(material.id).subscribe(() => this.loadMaterials());
+    this.confirmDialogService
+      .confirm({
+        title: 'Obriši gradivo',
+        message: `Obrisati gradivo "${material.title}"?`,
+        confirmLabel: 'Obriši',
+        danger: true
+      })
+      .subscribe((confirmed) => {
+        if (!confirmed) return;
+        this.materialService.delete(material.id).subscribe(() => this.loadMaterials());
+      });
   }
 
   openSummaryDialog(material: StudyMaterial): void {
@@ -139,7 +152,7 @@ export class MaterialListComponent implements OnInit {
       },
       error: (err) => {
         this.generatingQuizFor.set(null);
-        alert(err?.error?.message ?? 'Generisanje kviza nije uspelo.');
+        this.snackBar.open(err?.error?.message ?? 'Generisanje kviza nije uspelo.', 'Zatvori', { duration: 6000 });
       }
     });
   }
