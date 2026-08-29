@@ -3,55 +3,148 @@
 @if (loading()) {
   <p>Učitavanje...</p>
 } @else {
-  <form [formGroup]="form" (ngSubmit)="submit()">
-    <mat-card class="section-card">
-      <mat-card-header>
-        <mat-card-title>Preferirano vreme za učenje</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <mat-form-field appearance="outline">
-          <mat-label>Preferirano vreme</mat-label>
-          <mat-select formControlName="preferredStudyTime">
-            <mat-option [value]="null">Nije određeno</mat-option>
-            <mat-option value="MORNING">Jutro</mat-option>
-            <mat-option value="AFTERNOON">Popodne</mat-option>
-            <mat-option value="EVENING">Veče</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </mat-card-content>
-    </mat-card>
+  <mat-tab-group animationDuration="0ms" dynamicHeight>
+    <mat-tab label="Lični podaci">
+      <div class="tab-content">
+        <form [formGroup]="personalForm" (ngSubmit)="savePersonalInfo()">
+          <mat-card class="section-card">
+            <mat-card-header>
+              <mat-card-title>Lični podaci</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="row">
+                <mat-form-field appearance="outline">
+                  <mat-label>Ime</mat-label>
+                  <input matInput formControlName="firstName" />
+                  @if (personalForm.controls.firstName.hasError('required')) {
+                    <mat-error>Ime je obavezno</mat-error>
+                  }
+                </mat-form-field>
 
-    <mat-card class="section-card">
-      <mat-card-header>
-        <mat-card-title>Raspoloživo vreme za učenje</mat-card-title>
-        <mat-card-subtitle>Označi dane kada možeš da učiš i unesi vremenski interval</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="days" formArrayName="days">
-          @for (day of days; track day.value; let i = $index) {
-            <div class="day-row" [formGroupName]="i">
-              <mat-checkbox formControlName="enabled">{{ day.label }}</mat-checkbox>
-              <mat-form-field appearance="outline" class="time-field">
-                <mat-label>Od</mat-label>
-                <input matInput type="time" formControlName="startTime" />
+                <mat-form-field appearance="outline">
+                  <mat-label>Prezime</mat-label>
+                  <input matInput formControlName="lastName" />
+                  @if (personalForm.controls.lastName.hasError('required')) {
+                    <mat-error>Prezime je obavezno</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+
+              @if (personalInfoErrorMessage()) {
+                <p class="error-message">{{ personalInfoErrorMessage() }}</p>
+              }
+              @if (personalInfoSuccessMessage()) {
+                <p class="success-message">{{ personalInfoSuccessMessage() }}</p>
+              }
+            </mat-card-content>
+          </mat-card>
+
+          <button mat-flat-button color="primary" type="submit" [disabled]="savingPersonalInfo()">Sačuvaj</button>
+        </form>
+
+        <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+          <mat-card class="section-card">
+            <mat-card-header>
+              <mat-card-title>Promena lozinke</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <mat-form-field appearance="outline">
+                <mat-label>Trenutna lozinka</mat-label>
+                <input matInput type="password" formControlName="currentPassword" />
+                @if (passwordForm.controls.currentPassword.hasError('required')) {
+                  <mat-error>Trenutna lozinka je obavezna</mat-error>
+                }
               </mat-form-field>
-              <mat-form-field appearance="outline" class="time-field">
-                <mat-label>Do</mat-label>
-                <input matInput type="time" formControlName="endTime" />
+
+              <div class="row">
+                <mat-form-field appearance="outline">
+                  <mat-label>Nova lozinka</mat-label>
+                  <input matInput type="password" formControlName="newPassword" />
+                  @if (passwordForm.controls.newPassword.hasError('required')) {
+                    <mat-error>Nova lozinka je obavezna</mat-error>
+                  }
+                  @if (passwordForm.controls.newPassword.hasError('minlength')) {
+                    <mat-error>Lozinka mora imati bar 8 karaktera</mat-error>
+                  }
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Potvrdi novu lozinku</mat-label>
+                  <input matInput type="password" formControlName="confirmNewPassword" />
+                  @if (passwordForm.controls.confirmNewPassword.hasError('required')) {
+                    <mat-error>Potvrda lozinke je obavezna</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+
+              @if (passwordErrorMessage()) {
+                <p class="error-message">{{ passwordErrorMessage() }}</p>
+              }
+              @if (passwordSuccessMessage()) {
+                <p class="success-message">{{ passwordSuccessMessage() }}</p>
+              }
+            </mat-card-content>
+          </mat-card>
+
+          <button mat-flat-button color="primary" type="submit" [disabled]="changingPassword()">Promeni lozinku</button>
+        </form>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Podešavanja učenja">
+      <div class="tab-content">
+        <form [formGroup]="form" (ngSubmit)="submit()">
+          <mat-card class="section-card">
+            <mat-card-header>
+              <mat-card-title>Preferirano vreme za učenje</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <mat-form-field appearance="outline">
+                <mat-label>Preferirano vreme</mat-label>
+                <mat-select formControlName="preferredStudyTime">
+                  <mat-option [value]="null">Nije određeno</mat-option>
+                  <mat-option value="MORNING">Jutro</mat-option>
+                  <mat-option value="AFTERNOON">Popodne</mat-option>
+                  <mat-option value="EVENING">Veče</mat-option>
+                </mat-select>
               </mat-form-field>
-            </div>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="section-card">
+            <mat-card-header>
+              <mat-card-title>Raspoloživo vreme za učenje</mat-card-title>
+              <mat-card-subtitle>Označi dane kada možeš da učiš i unesi vremenski interval</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="days" formArrayName="days">
+                @for (day of days; track day.value; let i = $index) {
+                  <div class="day-row" [formGroupName]="i">
+                    <mat-checkbox formControlName="enabled">{{ day.label }}</mat-checkbox>
+                    <mat-form-field appearance="outline" class="time-field">
+                      <mat-label>Od</mat-label>
+                      <input matInput type="time" formControlName="startTime" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="time-field">
+                      <mat-label>Do</mat-label>
+                      <input matInput type="time" formControlName="endTime" />
+                    </mat-form-field>
+                  </div>
+                }
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          @if (errorMessage()) {
+            <p class="error-message">{{ errorMessage() }}</p>
           }
-        </div>
-      </mat-card-content>
-    </mat-card>
+          @if (successMessage()) {
+            <p class="success-message">{{ successMessage() }}</p>
+          }
 
-    @if (errorMessage()) {
-      <p class="error-message">{{ errorMessage() }}</p>
-    }
-    @if (successMessage()) {
-      <p class="success-message">{{ successMessage() }}</p>
-    }
-
-    <button mat-flat-button color="primary" type="submit" [disabled]="saving()">Sačuvaj</button>
-  </form>
+          <button mat-flat-button color="primary" type="submit" [disabled]="saving()">Sačuvaj</button>
+        </form>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
 }
