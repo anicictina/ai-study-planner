@@ -9,6 +9,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { forkJoin } from 'rxjs';
 import { Exam } from '../../core/models/exam.model';
 import { Subject } from '../../core/models/subject.model';
+import { ConfirmDialogService } from '../../core/services/confirm-dialog.service';
 import { ExamService } from '../../core/services/exam.service';
 import { SubjectService } from '../../core/services/subject.service';
 import { ExamFormDialogComponent } from '../exam-form-dialog/exam-form-dialog.component';
@@ -26,6 +27,7 @@ export class ExamListComponent implements OnInit {
   private readonly examService = inject(ExamService);
   private readonly subjectService = inject(SubjectService);
   private readonly dialog = inject(MatDialog);
+  private readonly confirmDialogService = inject(ConfirmDialogService);
 
   readonly exams = signal<Exam[]>([]);
   readonly subjects = signal<Subject[]>([]);
@@ -75,7 +77,16 @@ export class ExamListComponent implements OnInit {
   }
 
   remove(exam: Exam): void {
-    if (!confirm(`Obrisati ispit iz predmeta "${exam.subjectName}"?`)) return;
-    this.examService.delete(exam.id).subscribe(() => this.load());
+    this.confirmDialogService
+      .confirm({
+        title: 'Obriši ispit',
+        message: `Obrisati ispit iz predmeta "${exam.subjectName}"?`,
+        confirmLabel: 'Obriši',
+        danger: true
+      })
+      .subscribe((confirmed) => {
+        if (!confirmed) return;
+        this.examService.delete(exam.id).subscribe(() => this.load());
+      });
   }
 }

@@ -9,6 +9,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { forkJoin } from 'rxjs';
 import { StudySession } from '../../core/models/study-session.model';
 import { Subject } from '../../core/models/subject.model';
+import { ConfirmDialogService } from '../../core/services/confirm-dialog.service';
 import { StudySessionService } from '../../core/services/study-session.service';
 import { SubjectService } from '../../core/services/subject.service';
 import { StudySessionFormDialogComponent } from '../study-session-form-dialog/study-session-form-dialog.component';
@@ -40,6 +41,7 @@ export class StudySessionListComponent implements OnInit {
   private readonly studySessionService = inject(StudySessionService);
   private readonly subjectService = inject(SubjectService);
   private readonly dialog = inject(MatDialog);
+  private readonly confirmDialogService = inject(ConfirmDialogService);
 
   readonly sessions = signal<StudySession[]>([]);
   readonly subjects = signal<Subject[]>([]);
@@ -89,7 +91,16 @@ export class StudySessionListComponent implements OnInit {
   }
 
   remove(session: StudySession): void {
-    if (!confirm(`Obrisati sesiju iz predmeta "${session.subjectName}"?`)) return;
-    this.studySessionService.delete(session.id).subscribe(() => this.load());
+    this.confirmDialogService
+      .confirm({
+        title: 'Obriši sesiju',
+        message: `Obrisati sesiju iz predmeta "${session.subjectName}"?`,
+        confirmLabel: 'Obriši',
+        danger: true
+      })
+      .subscribe((confirmed) => {
+        if (!confirmed) return;
+        this.studySessionService.delete(session.id).subscribe(() => this.load());
+      });
   }
 }

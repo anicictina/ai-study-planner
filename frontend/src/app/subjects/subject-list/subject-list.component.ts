@@ -8,6 +8,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subject } from '../../core/models/subject.model';
+import { ConfirmDialogService } from '../../core/services/confirm-dialog.service';
 import { SubjectService } from '../../core/services/subject.service';
 import { SubjectFormDialogComponent } from '../subject-form-dialog/subject-form-dialog.component';
 
@@ -33,6 +34,7 @@ const PRIORITY_LABELS: Record<string, string> = { LOW: 'Nizak', MEDIUM: 'Srednji
 export class SubjectListComponent implements OnInit {
   private readonly subjectService = inject(SubjectService);
   private readonly dialog = inject(MatDialog);
+  private readonly confirmDialogService = inject(ConfirmDialogService);
 
   readonly subjects = signal<Subject[]>([]);
   readonly showArchived = signal(false);
@@ -76,12 +78,25 @@ export class SubjectListComponent implements OnInit {
   }
 
   archive(subject: Subject): void {
-    if (!confirm(`Arhivirati predmet "${subject.name}"?`)) return;
-    this.subjectService.archive(subject.id).subscribe(() => this.load());
+    this.confirmDialogService
+      .confirm({ title: 'Arhiviraj predmet', message: `Arhivirati predmet "${subject.name}"?` })
+      .subscribe((confirmed) => {
+        if (!confirmed) return;
+        this.subjectService.archive(subject.id).subscribe(() => this.load());
+      });
   }
 
   remove(subject: Subject): void {
-    if (!confirm(`Obrisati predmet "${subject.name}"? Ova akcija se ne može poništiti.`)) return;
-    this.subjectService.delete(subject.id).subscribe(() => this.load());
+    this.confirmDialogService
+      .confirm({
+        title: 'Obriši predmet',
+        message: `Obrisati predmet "${subject.name}"? Ova akcija se ne može poništiti.`,
+        confirmLabel: 'Obriši',
+        danger: true
+      })
+      .subscribe((confirmed) => {
+        if (!confirmed) return;
+        this.subjectService.delete(subject.id).subscribe(() => this.load());
+      });
   }
 }

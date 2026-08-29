@@ -9,6 +9,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { forkJoin } from 'rxjs';
 import { Reminder } from '../../core/models/reminder.model';
 import { Subject } from '../../core/models/subject.model';
+import { ConfirmDialogService } from '../../core/services/confirm-dialog.service';
 import { ReminderService } from '../../core/services/reminder.service';
 import { SubjectService } from '../../core/services/subject.service';
 import { ReminderFormDialogComponent } from '../reminder-form-dialog/reminder-form-dialog.component';
@@ -24,6 +25,7 @@ export class ReminderListComponent implements OnInit {
   private readonly reminderService = inject(ReminderService);
   private readonly subjectService = inject(SubjectService);
   private readonly dialog = inject(MatDialog);
+  private readonly confirmDialogService = inject(ConfirmDialogService);
 
   readonly reminders = signal<Reminder[]>([]);
   readonly subjects = signal<Subject[]>([]);
@@ -83,7 +85,11 @@ export class ReminderListComponent implements OnInit {
   }
 
   remove(reminder: Reminder): void {
-    if (!confirm('Obrisati ovaj podsetnik?')) return;
-    this.reminderService.delete(reminder.id).subscribe(() => this.load());
+    this.confirmDialogService
+      .confirm({ title: 'Obriši podsetnik', message: 'Obrisati ovaj podsetnik?', confirmLabel: 'Obriši', danger: true })
+      .subscribe((confirmed) => {
+        if (!confirmed) return;
+        this.reminderService.delete(reminder.id).subscribe(() => this.load());
+      });
   }
 }
