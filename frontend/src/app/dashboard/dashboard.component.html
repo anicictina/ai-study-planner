@@ -5,9 +5,102 @@
   </div>
 </div>
 
+<div class="personal-row">
+  <div class="quote-card">
+    <mat-icon>format_quote</mat-icon>
+    <p class="quote-text">{{ quoteOfTheDay }}</p>
+  </div>
+
+  <div class="clock-card">
+    <div class="clock-face">
+      @for (tick of [0,1,2,3,4,5,6,7,8,9,10,11]; track tick) {
+        <span class="clock-tick" [style.transform]="'rotate(' + (tick * 30) + 'deg)'"></span>
+      }
+      <div class="clock-hand clock-hand-hour" [style.transform]="'rotate(' + hourHandDegrees() + 'deg)'"></div>
+      <div class="clock-hand clock-hand-minute" [style.transform]="'rotate(' + minuteHandDegrees() + 'deg)'"></div>
+      <div class="clock-center"></div>
+    </div>
+    <span class="clock-time">{{ clockTimeLabel() }}</span>
+    <span class="clock-day">{{ clockDayLabel() }}</span>
+  </div>
+</div>
+
+<div class="ai-features">
+  <h2 class="ai-features-title">
+    <mat-icon>auto_awesome</mat-icon>
+    AI funkcije
+  </h2>
+  <div class="ai-features-grid">
+    <a routerLink="/study-plan">
+      <mat-card class="ai-feature-card">
+        <mat-icon>event_available</mat-icon>
+        <div class="ai-feature-text">
+          <span class="ai-feature-title">AI plan učenja</span>
+          <span class="ai-feature-subtitle">Personalizovan raspored na osnovu tvojih ispita i znanja</span>
+        </div>
+      </mat-card>
+    </a>
+    <a routerLink="/quizzes">
+      <mat-card class="ai-feature-card">
+        <mat-icon>quiz</mat-icon>
+        <div class="ai-feature-text">
+          <span class="ai-feature-title">AI generisanje kvizova</span>
+          <span class="ai-feature-subtitle">Pitanja generisana iz tvog gradiva</span>
+        </div>
+      </mat-card>
+    </a>
+    <a routerLink="/materials">
+      <mat-card class="ai-feature-card">
+        <mat-icon>summarize</mat-icon>
+        <div class="ai-feature-text">
+          <span class="ai-feature-title">AI sažetak gradiva</span>
+          <span class="ai-feature-subtitle">Ključni pojmovi, definicije i pitanja za ispit</span>
+        </div>
+      </mat-card>
+    </a>
+  </div>
+</div>
+
+@if (pendingPlan(); as plan) {
+  <a routerLink="/study-plan" class="plan-banner">
+    <mat-icon>auto_awesome</mat-icon>
+    <span>Imaš predlog plana učenja koji čeka odobrenje.</span>
+    <span class="plan-banner-action">Pregledaj <mat-icon>arrow_forward</mat-icon></span>
+  </a>
+}
+
 @if (!loading() && stats(); as s) {
-  <div class="widgets-grid">
-    <mat-card class="widget-card">
+  <div class="stat-strip">
+    <div class="stat-chip">
+      <mat-icon>menu_book</mat-icon>
+      <div class="stat-text">
+        <span class="stat-value">{{ activeSubjectCount() }}</span>
+        <span class="stat-label">{{ activeSubjectCount() === 1 ? 'aktivan predmet' : 'aktivnih predmeta' }}</span>
+      </div>
+    </div>
+    <div class="stat-chip">
+      <mat-icon>schedule</mat-icon>
+      <div class="stat-text">
+        <span class="stat-value">{{ formatMinutes(todayPlannedMinutes()) }}</span>
+        <span class="stat-label">planirano danas</span>
+      </div>
+    </div>
+    <div class="stat-chip">
+      <mat-icon>event_note</mat-icon>
+      <div class="stat-text">
+        @if (nearestExamDays(); as days) {
+          <span class="stat-value">{{ days }} {{ days === 1 ? 'dan' : 'dana' }}</span>
+          <span class="stat-label">do sledećeg ispita</span>
+        } @else {
+          <span class="stat-value">—</span>
+          <span class="stat-label">nema zakazanih ispita</span>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-grid">
+    <mat-card class="widget-card area-today">
       <mat-card-header>
         <mat-card-title>Današnji plan</mat-card-title>
       </mat-card-header>
@@ -28,7 +121,7 @@
       </mat-card-content>
     </mat-card>
 
-    <mat-card class="widget-card">
+    <mat-card class="widget-card area-exams">
       <mat-card-header>
         <mat-card-title>Predstojeći ispiti</mat-card-title>
       </mat-card-header>
@@ -49,7 +142,7 @@
       </mat-card-content>
     </mat-card>
 
-    <mat-card class="widget-card">
+    <mat-card class="widget-card area-weekly">
       <mat-card-header>
         <mat-card-title>Nedeljni napredak</mat-card-title>
         <mat-card-subtitle>{{ formatMinutes(s.weeklyStudy.totalMinutes) }} ove nedelje</mat-card-subtitle>
@@ -70,7 +163,7 @@
       </mat-card-content>
     </mat-card>
 
-    <mat-card class="widget-card">
+    <mat-card class="widget-card area-quiz">
       <mat-card-header>
         <mat-card-title>Prosek na kvizovima</mat-card-title>
         <mat-card-subtitle>{{ s.quizStats.averageScorePercent }}% u proseku</mat-card-subtitle>
@@ -98,7 +191,34 @@
       </mat-card-content>
     </mat-card>
 
-    <mat-card class="widget-card wide">
+    <div class="quick-links area-quicklinks">
+      <a routerLink="/subjects">
+        <mat-card class="quick-link-card">
+          <mat-icon>menu_book</mat-icon>
+          <span>Predmeti</span>
+        </mat-card>
+      </a>
+      <a routerLink="/exams">
+        <mat-card class="quick-link-card">
+          <mat-icon>event_note</mat-icon>
+          <span>Ispiti</span>
+        </mat-card>
+      </a>
+      <a routerLink="/calendar">
+        <mat-card class="quick-link-card">
+          <mat-icon>calendar_month</mat-icon>
+          <span>Kalendar</span>
+        </mat-card>
+      </a>
+      <a routerLink="/pomodoro">
+        <mat-card class="quick-link-card">
+          <mat-icon>timer</mat-icon>
+          <span>Pomodoro</span>
+        </mat-card>
+      </a>
+    </div>
+
+    <mat-card class="widget-card area-materials">
       <mat-card-header>
         <mat-card-title>Savladano gradivo po predmetu</mat-card-title>
       </mat-card-header>
@@ -106,18 +226,29 @@
         @if (s.materialProgress.length === 0) {
           <p class="empty-widget">Nema još dodatog gradiva.</p>
         } @else {
-          <div class="progress-list">
+          <div class="subject-card-grid">
             @for (progress of s.materialProgress; track progress.subjectId) {
-              <div class="progress-row">
-                <span class="progress-label">{{ progress.subjectName }}</span>
-                <div class="progress-track">
+              <div
+                class="subject-progress-card"
+                [style.background]="'linear-gradient(135deg, ' + progress.color + '2b, ' + progress.color + '10)'"
+              >
+                <div class="subject-progress-percent">{{ progress.learnedPercent }}%</div>
+                <div class="subject-progress-icon" [style.background-color]="progress.color">
+                  <mat-icon>menu_book</mat-icon>
+                </div>
+                <div class="subject-progress-info">
+                  <span class="subject-progress-name">{{ progress.subjectName }}</span>
+                  <span class="subject-progress-meta">
+                    {{ progress.learnedMaterials }}/{{ progress.totalMaterials }} savladano
+                  </span>
+                </div>
+                <div class="subject-progress-track">
                   <div
-                    class="progress-fill"
+                    class="subject-progress-fill"
                     [style.width.%]="progress.learnedPercent"
                     [style.background-color]="progress.color"
                   ></div>
                 </div>
-                <span class="progress-value">{{ progress.learnedPercent }}%</span>
               </div>
             }
           </div>
@@ -126,30 +257,3 @@
     </mat-card>
   </div>
 }
-
-<div class="quick-links">
-  <a routerLink="/subjects">
-    <mat-card class="quick-link-card">
-      <mat-icon>menu_book</mat-icon>
-      <span>Predmeti</span>
-    </mat-card>
-  </a>
-  <a routerLink="/exams">
-    <mat-card class="quick-link-card">
-      <mat-icon>event_note</mat-icon>
-      <span>Ispiti</span>
-    </mat-card>
-  </a>
-  <a routerLink="/study-plan">
-    <mat-card class="quick-link-card">
-      <mat-icon>auto_awesome</mat-icon>
-      <span>AI Plan</span>
-    </mat-card>
-  </a>
-  <a routerLink="/calendar">
-    <mat-card class="quick-link-card">
-      <mat-icon>calendar_month</mat-icon>
-      <span>Kalendar</span>
-    </mat-card>
-  </a>
-</div>

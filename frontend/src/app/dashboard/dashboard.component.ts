@@ -1,13 +1,37 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { AuthService } from '../core/services/auth.service';
 import { StatisticsOverview } from '../core/models/statistics.model';
 import { StatisticsService } from '../core/services/statistics.service';
+import { StudyPlan } from '../core/models/study-plan.model';
+import { StudyPlanService } from '../core/services/study-plan.service';
+import { SubjectService } from '../core/services/subject.service';
 
 const WEEKDAY_LABELS = ['Pon', 'Uto', 'Sre', 'Čet', 'Pet', 'Sub', 'Ned'];
+const FULL_DAY_LABELS = [
+  'nedelja',
+  'ponedeljak',
+  'utorak',
+  'sreda',
+  'četvrtak',
+  'petak',
+  'subota'
+];
+
+const MOTIVATIONAL_QUOTES = [
+  'Napreduj svaki dan, makar malo.',
+  'Tvoja jedina granica je tvoj um.',
+  'Mali koraci i dalje vode do velikog cilja.',
+  'Disciplina danas znači sloboda sutra.',
+  'Ne moraš biti savršena, samo dosledna.',
+  'Svaki sat učenja te približava cilju.',
+  'Budi ponosna na trud koji ulažeš.'
+];
 
 interface TrendPoint {
   x: number;
@@ -23,14 +47,45 @@ interface TrendPoint {
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   private readonly authService = inject(AuthService);
   private readonly statisticsService = inject(StatisticsService);
+  private readonly subjectService = inject(SubjectService);
+  private readonly studyPlanService = inject(StudyPlanService);
+  private clockIntervalId: ReturnType<typeof setInterval> | null = null;
 
   readonly currentUser = this.authService.currentUser;
   readonly stats = signal<StatisticsOverview | null>(null);
+  readonly activeSubjectCount = signal(0);
+  readonly pendingPlan = signal<StudyPlan | null>(null);
   readonly loading = signal(true);
   readonly weekdayLabels = WEEKDAY_LABELS;
+  readonly now = signal(new Date());
+  readonly quoteOfTheDay = MOTIVATIONAL_QUOTES[Math.floor(Math.random() * MOTIVATIONAL_QUOTES.length)];
+
+  readonly clockTimeLabel = computed(() => {
+    const date = this.now();
+    return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+  });
+
+  readonly clockDayLabel = computed(() => FULL_DAY_LABELS[this.now().getDay()]);
+
+  readonly hourHandDegrees = computed(() => {
+    const date = this.now();
+    return (date.getHours() % 12) * 30 + date.getMinutes() * 0.5;
+  });
+
+  readonly minuteHandDegrees = computed(() => this.now().getMinutes() * 6);
+
+  readonly todayPlannedMinutes = computed(() => {
+    const sessions = this.stats()?.todaySessions ?? [];
+    return sessions.reduce((total, session) => total + session.durationMinutes, 0);
+  });
+
+  readonly nearestExamDays = computed(() => {
+    const exams = this.stats()?.upcomingExams ?? [];
+    return exams.length > 0 ? exams[0].daysRemaining : null;
+  });
 
   readonly maxDayMinutes = computed(() => {
     const byDay = this.stats()?.weeklyStudy.byDay ?? [];
@@ -60,13 +115,25 @@ export class DashboardComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.statisticsService.getOverview().subscribe({
-      next: (stats) => {
+    this.clockIntervalId = setInterval(() => this.now.set(new Date()), 30000);
+
+    forkJoin({
+      stats: this.statisticsService.getOverview(),
+      subjects: this.subjectService.getAll(false),
+      currentPlan: this.studyPlanService.getCurrent().pipe(catchError(() => of(null)))
+    }).subscribe({
+      next: ({ stats, subjects, currentPlan }) => {
         this.stats.set(stats);
+        this.activeSubjectCount.set(subjects.length);
+        this.pendingPlan.set(currentPlan?.status === 'PENDING' ? currentPlan : null);
         this.loading.set(false);
       },
       error: () => this.loading.set(false)
     });
+  }
+
+  ngOnDestroy(): void {
+    if (this.clockIntervalId) clearInterval(this.clockIntervalId);
   }
 
   barHeightPercent(minutes: number): number {
