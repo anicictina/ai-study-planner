@@ -9,6 +9,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { AuthService } from '../../core/services/auth.service';
 import { Reminder } from '../../core/models/reminder.model';
 import { ReminderService } from '../../core/services/reminder.service';
+import { ThemeService } from '../../core/services/theme.service';
 
 const POLL_INTERVAL_MS = 60000;
 
@@ -32,10 +33,12 @@ const POLL_INTERVAL_MS = 60000;
 export class LayoutComponent implements OnInit, OnDestroy {
   private readonly authService = inject(AuthService);
   private readonly reminderService = inject(ReminderService);
+  private readonly themeService = inject(ThemeService);
   private intervalId: ReturnType<typeof setInterval> | null = null;
 
   readonly currentUser = this.authService.currentUser;
   readonly dueReminders = signal<Reminder[]>([]);
+  readonly isDarkTheme = this.themeService.isDark;
 
   ngOnInit(): void {
     this.loadDueReminders();
@@ -55,6 +58,10 @@ export class LayoutComponent implements OnInit, OnDestroy {
 
   dismiss(reminder: Reminder): void {
     this.reminderService.dismiss(reminder.id).subscribe(() => this.loadDueReminders());
+  }
+
+  toggleTheme(): void {
+    this.themeService.toggle();
   }
 
   logout(): void {

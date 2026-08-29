@@ -19,6 +19,14 @@
 
   <span class="spacer"></span>
 
+  <button
+    mat-icon-button
+    (click)="toggleTheme()"
+    [matTooltip]="isDarkTheme() ? 'Uključi svetlu temu' : 'Uključi tamnu temu'"
+  >
+    <mat-icon>{{ isDarkTheme() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+  </button>
+
   <button mat-icon-button [matMenuTriggerFor]="reminderMenu" class="bell-button" matTooltip="Podsetnici">
     <mat-icon [matBadge]="dueReminders().length" [matBadgeHidden]="dueReminders().length === 0" matBadgeSize="small" matBadgeColor="warn">
       notifications
