@@ -22,4 +22,12 @@ export class ProfileService {
   updatePreferredTime(preferredStudyTime: PreferredTime | null): Observable<AuthUser> {
     return this.http.put<AuthUser>(`${this.apiUrl}/preferred-time`, { preferredStudyTime });
   }
+
+  updateName(firstName: string, lastName: string): Observable<AuthUser> {
+    return this.http.put<AuthUser>(`${this.apiUrl}/name`, { firstName, lastName });
+  }
+
+  changePassword(currentPassword: string, newPassword: string): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/password`, { currentPassword, newPassword });
+  }
 }

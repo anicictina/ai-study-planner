@@ -1,15 +1,22 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatTabsModule } from '@angular/material/tabs';
 import { forkJoin } from 'rxjs';
 import { AuthService } from '../core/services/auth.service';
 import { AvailabilitySlotRequest, DayOfWeek } from '../core/models/profile.model';
 import { ProfileService } from '../core/services/profile.service';
+
+function passwordsMatchValidator(group: AbstractControl): ValidationErrors | null {
+  const newPassword = group.get('newPassword')?.value;
+  const confirmNewPassword = group.get('confirmNewPassword')?.value;
+  return newPassword === confirmNewPassword ? null : { passwordMismatch: true };
+}
 
 const DAYS: { value: DayOfWeek; label: string }[] = [
   { value: 'MONDAY', label: 'Ponedeljak' },
@@ -31,7 +38,8 @@ const DAYS: { value: DayOfWeek; label: string }[] = [
     MatCheckboxModule,
     MatFormFieldModule,
     MatInputModule,
-    MatSelectModule
+    MatSelectModule,
+    MatTabsModule
   ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
@@ -47,6 +55,19 @@ export class ProfileComponent implements OnInit {
   readonly successMessage = signal<string | null>(null);
   readonly errorMessage = signal<string | null>(null);
 
+  readonly savingPersonalInfo = signal(false);
+  readonly personalInfoSuccessMessage = signal<string | null>(null);
+  readonly personalInfoErrorMessage = signal<string | null>(null);
+
+  readonly changingPassword = signal(false);
+  readonly passwordSuccessMessage = signal<string | null>(null);
+  readonly passwordErrorMessage = signal<string | null>(null);
+
+  readonly personalForm = this.fb.group({
+    firstName: [this.authService.currentUser()?.firstName ?? '', [Validators.required]],
+    lastName: [this.authService.currentUser()?.lastName ?? '', [Validators.required]]
+  });
+
   readonly form = this.fb.group({
     preferredStudyTime: [this.authService.currentUser()?.preferredStudyTime ?? null],
     days: this.fb.array(
@@ -59,6 +80,15 @@ export class ProfileComponent implements OnInit {
       )
     )
   });
+
+  readonly passwordForm = this.fb.group(
+    {
+      currentPassword: ['', [Validators.required]],
+      newPassword: ['', [Validators.required, Validators.minLength(8)]],
+      confirmNewPassword: ['', [Validators.required]]
+    },
+    { validators: [passwordsMatchValidator] }
+  );
 
   get daysArray(): FormArray<FormGroup> {
     return this.form.controls.days as FormArray<FormGroup>;
@@ -80,6 +110,31 @@ export class ProfileComponent implements OnInit {
         this.loading.set(false);
       },
       error: () => this.loading.set(false)
+    });
+  }
+
+  savePersonalInfo(): void {
+    this.personalInfoErrorMessage.set(null);
+    this.personalInfoSuccessMessage.set(null);
+
+    if (this.personalForm.invalid) {
+      this.personalForm.markAllAsTouched();
+      return;
+    }
+
+    this.savingPersonalInfo.set(true);
+    const raw = this.personalForm.getRawValue();
+
+    this.profileService.updateName(raw.firstName!, raw.lastName!).subscribe({
+      next: (user) => {
+        this.authService.updateCurrentUser(user);
+        this.savingPersonalInfo.set(false);
+        this.personalInfoSuccessMessage.set('Podaci su sačuvani.');
+      },
+      error: (err) => {
+        this.savingPersonalInfo.set(false);
+        this.personalInfoErrorMessage.set(err?.error?.message ?? 'Čuvanje podataka nije uspelo.');
+      }
     });
   }
 
@@ -120,6 +175,34 @@ export class ProfileComponent implements OnInit {
       error: (err) => {
         this.saving.set(false);
         this.errorMessage.set(err?.error?.message ?? 'Čuvanje podešavanja nije uspelo.');
+      }
+    });
+  }
+
+  changePassword(): void {
+    this.passwordErrorMessage.set(null);
+    this.passwordSuccessMessage.set(null);
+
+    if (this.passwordForm.invalid) {
+      this.passwordForm.markAllAsTouched();
+      if (this.passwordForm.hasError('passwordMismatch')) {
+        this.passwordErrorMessage.set('Nova lozinka i potvrda se ne poklapaju.');
+      }
+      return;
+    }
+
+    this.changingPassword.set(true);
+    const raw = this.passwordForm.getRawValue();
+
+    this.profileService.changePassword(raw.currentPassword!, raw.newPassword!).subscribe({
+      next: () => {
+        this.changingPassword.set(false);
+        this.passwordSuccessMessage.set('Lozinka je uspešno promenjena.');
+        this.passwordForm.reset();
+      },
+      error: (err) => {
+        this.changingPassword.set(false);
+        this.passwordErrorMessage.set(err?.error?.message ?? 'Promena lozinke nije uspela.');
       }
     });
   }

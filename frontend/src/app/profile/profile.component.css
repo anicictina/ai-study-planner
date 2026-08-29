@@ -4,9 +4,22 @@ h1 {
   margin-bottom: 24px;
 }
 
+.tab-content {
+  padding-top: 20px;
+}
+
 .section-card {
   max-width: 640px;
   margin-bottom: 16px;
+}
+
+.row {
+  display: flex;
+  gap: 12px;
+}
+
+.row mat-form-field {
+  flex: 1;
 }
 
 .days {

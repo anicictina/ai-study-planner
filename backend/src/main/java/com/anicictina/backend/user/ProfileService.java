@@ -3,11 +3,14 @@ package com.anicictina.backend.user;
 import com.anicictina.backend.security.CurrentUserProvider;
 import com.anicictina.backend.user.dto.AvailabilitySlotRequest;
 import com.anicictina.backend.user.dto.AvailabilitySlotResponse;
+import com.anicictina.backend.user.dto.ChangePasswordRequest;
+import com.anicictina.backend.user.dto.NameUpdateRequest;
 import com.anicictina.backend.user.dto.ProfileUpdateRequest;
 import com.anicictina.backend.user.dto.UserResponse;
 import jakarta.validation.ValidationException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +20,7 @@ public class ProfileService {
 
     private final CurrentUserProvider currentUserProvider;
     private final AvailabilitySlotRepository availabilitySlotRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
     public List<AvailabilitySlotResponse> getAvailability() {
@@ -57,5 +61,24 @@ public class ProfileService {
         User user = currentUserProvider.getCurrentUser();
         user.setPreferredStudyTime(request.getPreferredStudyTime());
         return UserResponse.from(user);
+    }
+
+    @Transactional
+    public UserResponse updateName(NameUpdateRequest request) {
+        User user = currentUserProvider.getCurrentUser();
+        user.setFirstName(request.getFirstName().trim());
+        user.setLastName(request.getLastName().trim());
+        return UserResponse.from(user);
+    }
+
+    @Transactional
+    public void changePassword(ChangePasswordRequest request) {
+        User user = currentUserProvider.getCurrentUser();
+
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPasswordHash())) {
+            throw new ValidationException("Trenutna lozinka nije tačna.");
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
     }
 }
