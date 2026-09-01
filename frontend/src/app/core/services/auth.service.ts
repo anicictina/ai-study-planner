@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { AuthResponse, AuthUser, LoginRequest, RegisterRequest } from '../models/user.model';
+import { AuthResponse, AuthUser, LoginRequest, RegisterRequest, RegisterResponse } from '../models/user.model';
 
 const TOKEN_KEY = 'asp_token';
 const USER_KEY = 'asp_user';
@@ -22,10 +22,12 @@ export class AuthService {
     private readonly router: Router
   ) {}
 
-  register(request: RegisterRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, request).pipe(
-      tap((response) => this.setSession(response))
-    );
+  register(request: RegisterRequest): Observable<RegisterResponse> {
+    return this.http.post<RegisterResponse>(`${this.apiUrl}/register`, request);
+  }
+
+  verifyEmail(token: string): Observable<void> {
+    return this.http.get<void>(`${this.apiUrl}/verify-email`, { params: { token } });
   }
 
   login(request: LoginRequest): Observable<AuthResponse> {

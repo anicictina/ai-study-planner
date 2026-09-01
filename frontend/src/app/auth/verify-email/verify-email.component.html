@@ -1,0 +1,28 @@
+<div class="verify-page">
+  <mat-card class="verify-card">
+    <mat-card-content>
+      @switch (state()) {
+        @case ('loading') {
+          <div class="verify-state">
+            <mat-spinner diameter="36" />
+            <p>Potvrđujemo tvoj nalog...</p>
+          </div>
+        }
+        @case ('success') {
+          <div class="verify-state">
+            <mat-icon class="icon-success">check_circle</mat-icon>
+            <p>Nalog je uspešno potvrđen. Sada možeš da se prijaviš.</p>
+            <a mat-flat-button color="primary" routerLink="/login">Prijavi se</a>
+          </div>
+        }
+        @case ('error') {
+          <div class="verify-state">
+            <mat-icon class="icon-error">error</mat-icon>
+            <p>{{ errorMessage() }}</p>
+            <a mat-flat-button color="primary" routerLink="/register">Nazad na registraciju</a>
+          </div>
+        }
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

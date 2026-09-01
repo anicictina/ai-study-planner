@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -29,7 +29,6 @@ import { passwordMatchValidator } from '../password-match.validator';
 export class RegisterComponent {
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
-  private readonly router = inject(Router);
 
   readonly form = this.fb.group(
     {
@@ -45,6 +44,7 @@ export class RegisterComponent {
   readonly loading = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly hidePassword = signal(true);
+  readonly registeredEmail = signal<string | null>(null);
 
   submit(): void {
     if (this.form.invalid) {
@@ -60,7 +60,10 @@ export class RegisterComponent {
     this.authService
       .register({ firstName: firstName!, lastName: lastName!, email: email!, password: password! })
       .subscribe({
-        next: () => this.router.navigateByUrl('/dashboard'),
+        next: (response) => {
+          this.loading.set(false);
+          this.registeredEmail.set(response.email);
+        },
         error: (err) => {
           this.loading.set(false);
           this.errorMessage.set(err?.error?.message ?? 'Registracija nije uspela. Pokušajte ponovo.');
