@@ -14,6 +14,15 @@
     </mat-card-header>
 
     <mat-card-content>
+      @if (registeredEmail(); as email) {
+        <div class="verification-notice">
+          <mat-icon>mark_email_read</mat-icon>
+          <p>
+            Poslali smo mejl za potvrdu naloga na <strong>{{ email }}</strong>. Klikni link iz mejla da bi mogla
+            da se prijaviš.
+          </p>
+        </div>
+      } @else {
       <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form">
         <div class="name-row">
           <mat-form-field appearance="outline">
@@ -92,6 +101,7 @@
           }
         </button>
       </form>
+      }
     </mat-card-content>
 
     <mat-card-footer class="auth-footer">

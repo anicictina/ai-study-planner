@@ -53,6 +53,13 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private PreferredTime preferredStudyTime;
 
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    private boolean emailVerified;
+
+    private String verificationToken;
+
+    private Instant verificationTokenExpiresAt;
+
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -64,6 +71,11 @@ public class User implements UserDetails {
         if (role == null) {
             role = Role.STUDENT;
         }
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return emailVerified;
     }
 
     @Override

@@ -80,6 +80,26 @@
   height: 44px;
 }
 
+.verification-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  border-radius: var(--mat-sys-corner-large);
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+  margin-top: 8px;
+}
+
+.verification-notice mat-icon {
+  flex-shrink: 0;
+}
+
+.verification-notice p {
+  margin: 0;
+  line-height: 1.5;
+}
+
 .error-message {
   color: var(--mat-sys-error);
   font-size: 0.875rem;
