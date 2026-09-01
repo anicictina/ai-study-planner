@@ -7,10 +7,13 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -39,6 +42,24 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleMaxUploadSizeExceeded(MaxUploadSizeExceededException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(new ErrorResponse("Fajl je prevelik. Maksimalna veličina je 10MB."));
+    }
+
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ResponseEntity<ErrorResponse> handleMissingServletRequestPart(MissingServletRequestPartException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(new ErrorResponse("Nedostaje obavezan deo zahteva: " + ex.getRequestPartName()));
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(new ErrorResponse("Nevažeća vrednost parametra: " + ex.getName()));
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(new ErrorResponse("Telo zahteva nije validno ili sadrži nepoznatu vrednost."));
     }
 
     @ExceptionHandler(ValidationException.class)
